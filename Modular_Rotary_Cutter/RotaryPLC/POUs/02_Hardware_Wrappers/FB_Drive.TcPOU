@@ -96,6 +96,17 @@ M_MoveVel := TRUE;]]></ST>
         <ST><![CDATA[fbStop.Execute := TRUE; M_Stop := TRUE;]]></ST>
       </Implementation>
     </Method>
+    <Property Name="P_Axis" Id="{c438ebb6-f4fa-4896-b4fc-45b79fc5096e}">
+      <Declaration><![CDATA[PROPERTY P_Axis : REFERENCE TO AXIS_REF]]></Declaration>
+      <Get Name="Get" Id="{971a64fc-7619-44e1-b200-2ade4597c9b2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[P_Axis REF= Axis; // This creates a 'link' to the real Axis variable]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Property Name="P_Busy" Id="{0954bfd9-2a2f-442b-88a7-0fc7aa654616}">
       <Declaration><![CDATA[{warning 'Add property implementation'}
 PROPERTY P_Busy : BOOL

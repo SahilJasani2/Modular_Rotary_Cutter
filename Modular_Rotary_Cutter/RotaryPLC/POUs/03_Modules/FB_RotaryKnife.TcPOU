@@ -3,27 +3,61 @@
   <POU Name="FB_RotaryKnife" Id="{48fb6193-f953-456c-9937-b4916335cb68}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RotaryKnife
 VAR
-    // Hardware Link
-    iMotor          : I_Drive;
+    // --- Hardware Link ---
+    iMotor          : I_Drive; // The motor that spins the blade
     
-    // Configuration
+    // --- Master Reference ---
+    // We use a REFERENCE so we don't copy the whole Axis structure
+    pMasterAxis     : REFERENCE TO AXIS_REF; 
+    
+    // --- Motion Control Blocks ---
+    fbGearIn        : MC_GearIn;
+    fbGearOut       : MC_GearOut;
+    
+    // --- Configuration ---
     fKnifeDiameter  : LREAL := 100.0; // mm
+    fGearRatio      : LREAL := 1.0;   // 1:1 speed matching
     
-    // Commands & Status
-    bEnable         : BOOL;
-    bIsSynchronized : BOOL;
-    bError          : BOOL;
+    // --- Commands & Status ---
+    bEnable         : BOOL;  // Torque on/off
+    bSyncCommand    : BOOL;  // Request to 'Lock' to the conveyor
+    bIsSynchronized : BOOL;  // Feedback that we are locked
+    bError          : BOOL;  // Fault status
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// 1. Safety Check: Make sure a motor is actually assigned to this module
+      <ST><![CDATA[// 1. Safety Check: Only run if a motor has been assigned
 IF iMotor <> 0 THEN
     
     // 2. Control the Motor Power
     iMotor.P_Enabled := bEnable;
-    
-    // 3. Monitor for Errors
     bError := iMotor.P_Error;
 
+    // 3. Electronic Gearing (Synchronization)
+    // __ISVALIDREF checks if we have actually pointed this at a Master axis
+    IF __ISVALIDREF(pMasterAxis) THEN
+        
+        // Command to Lock the Knife to the Conveyor
+        fbGearIn(
+            Master          := pMasterAxis,
+            Slave           := iMotor.P_Axis, // Using the new property we just made
+            Execute         := bSyncCommand,
+            RatioNumerator  := 1,
+            RatioDenominator := 1,
+            Acceleration    := 1000,
+            Deceleration    := 1000
+        );
+        
+        // Update Status
+        bIsSynchronized := fbGearIn.InGear;
+        
+        // Command to Unlock (Stop following)
+        fbGearOut(
+            Slave           := iMotor.P_Axis,
+            Execute         := NOT bSyncCommand AND bIsSynchronized
+        );
+        
+    END_IF
+    
 END_IF]]></ST>
     </Implementation>
   </POU>

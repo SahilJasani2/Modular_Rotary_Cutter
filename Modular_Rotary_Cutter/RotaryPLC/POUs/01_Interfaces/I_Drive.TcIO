@@ -30,6 +30,12 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
     </Method>
+    <Property Name="P_Axis" Id="{eda4508a-df38-42ba-8ca4-a7131309c777}">
+      <Declaration><![CDATA[PROPERTY P_Axis : REFERENCE TO AXIS_REF]]></Declaration>
+      <Get Name="Get" Id="{ee71f141-6459-44ab-b94c-8cc5508c2bab}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Property Name="P_Busy" Id="{4f7370ed-5031-445d-b4e4-3dfd735989e5}">
       <Declaration><![CDATA[PROPERTY P_Busy : BOOL]]></Declaration>
       <Get Name="Get" Id="{9c69d565-c6d0-4e09-9883-0f4cdb58c5be}">
