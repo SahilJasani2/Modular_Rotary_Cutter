@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_DigitalSensor" Id="{6a39500a-bba7-4420-a58b-3b1e1df2d295}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DigitalSensor IMPLEMENTS I_DigitalSensor
+VAR
+    // --- Hardware Link ---
+    // The AT %I* tells TwinCAT: "I will link this to a real physical wire later"
+    bRawInput AT %I* : BOOL; 
+    
+    // --- Internal State ---
+    bActive : BOOL;
+    bInvert : BOOL;
+    
+    // --- Edge Detection (Standard Library) ---
+    fbRisingEdge  : R_TRIG;
+    fbFallingEdge : F_TRIG;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// 1. Handle the Hardware Wiring (Normally Open vs Normally Closed)
+IF bInvert THEN
+    bActive := NOT bRawInput;
+ELSE
+    bActive := bRawInput;
+END_IF
+
+// 2. Run the Edge Detection Blocks
+fbRisingEdge(CLK := bActive);
+fbFallingEdge(CLK := bActive);]]></ST>
+    </Implementation>
+    <Property Name="P_FallingEdge" Id="{72f4abad-3ae3-4f58-b135-9f5a75a1fd1b}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY P_FallingEdge : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{b0ae2ae5-df28-4956-9e04-dca118232247}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[P_FallingEdge := fbFallingEdge.Q;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{ebfe0540-2757-448e-8011-1e5f89686c1e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="P_InvertLogic" Id="{57b94ec5-d24f-4c9c-a6b7-07a035eda686}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY P_InvertLogic : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{20e957c8-a18e-4390-a9c2-49240c515bf6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[P_InvertLogic := bInvert;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c82c233e-2a1a-4b38-a570-354712badd9a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bInvert := P_InvertLogic;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="P_IsActive" Id="{6658c044-a2a4-4549-af8e-3f2dbece7dd9}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY P_IsActive : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{e4a1d8ae-496f-4623-8545-04bb1bf31e3c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[P_IsActive := bActive;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{035822bc-acd6-4752-8f28-b6602e6e2ed0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="P_RisingEdge" Id="{1f8356ea-8544-48ad-887b-04c9041b4561}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY P_RisingEdge : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{89600acc-e52f-4c87-ad9e-f13342bf3b69}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[P_RisingEdge := fbRisingEdge.Q;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a83eec21-3202-40b1-8fdb-cefa16154830}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

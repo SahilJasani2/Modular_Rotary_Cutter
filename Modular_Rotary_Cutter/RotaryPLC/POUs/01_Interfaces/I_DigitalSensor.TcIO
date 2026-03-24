@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_DigitalSensor" Id="{4a0fb15b-571c-49ee-a291-a7cb4ebc0888}">
+    <Declaration><![CDATA[INTERFACE I_DigitalSensor
+]]></Declaration>
+    <Property Name="P_FallingEdge" Id="{cca12828-8794-4bae-8f80-a7b224b9dd10}">
+      <Declaration><![CDATA[PROPERTY P_FallingEdge : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a6bfdde5-4376-4b00-a7ff-b86746c91b0c}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{960ebbf7-e588-41c9-9237-ada5c586552b}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="P_InvertLogic" Id="{be3a0c06-e840-4370-b33b-386d2694528b}">
+      <Declaration><![CDATA[PROPERTY P_InvertLogic : BOOL]]></Declaration>
+      <Get Name="Get" Id="{2fe223f1-6213-48f1-98bd-779c84b2846c}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{71d3608d-d82c-4aba-88b6-a38bfff55f6d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="P_IsActive" Id="{838e7c94-ac81-4e1c-b22b-1bdd97939a7f}">
+      <Declaration><![CDATA[PROPERTY P_IsActive : BOOL]]></Declaration>
+      <Get Name="Get" Id="{161b89e0-3288-44c4-909b-777792fb2ee5}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{162f83d0-695c-4fc3-8cb4-5e6d0929eb7b}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="P_RisingEdge" Id="{f52a9598-e36f-4892-97b1-79ba6c72a93d}">
+      <Declaration><![CDATA[PROPERTY P_RisingEdge : BOOL]]></Declaration>
+      <Get Name="Get" Id="{c02428f4-e925-4cf0-92c9-d7a48d48423b}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{4a8acdf0-7702-4adc-8be0-0694f3ec1835}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+  </Itf>
+</TcPlcObject>
