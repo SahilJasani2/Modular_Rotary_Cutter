@@ -105,7 +105,8 @@ PROPERTY P_Busy : BOOL
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[// The axis is busy if it is physically moving or if a move block is still active
+P_Busy := Axis.Status.Moving OR fbMoveAbs.Busy OR fbMoveVel.Busy;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -118,7 +119,7 @@ PROPERTY P_Enabled : BOOL
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[P_Enabled := bEnableCmd;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{a6e6e813-1d0d-42b7-b058-ad03723ae751}">
@@ -126,7 +127,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[bEnableCmd := P_Enabled;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -139,7 +140,7 @@ PROPERTY P_Error : BOOL
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[P_Error := Axis.Status.Error;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -152,7 +153,7 @@ PROPERTY P_Ready : BOOL
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[P_Ready := Axis.Status.Ready;]]></ST>
         </Implementation>
       </Get>
     </Property>
