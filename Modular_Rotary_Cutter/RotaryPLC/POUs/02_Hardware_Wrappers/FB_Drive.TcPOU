@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_Drive" Id="{29575593-8274-429c-a355-871bac34c303}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Drive IMPLEMENTS I_Drive
+VAR
+    // --- The Link to TwinCAT Motion (NC) ---
+    // This is the "Data Highway" between your PLC code and the NC-Task
+    Axis : AXIS_REF; 
+
+    // --- Standard PLCopen Motion Blocks ---
+    fbPower     : MC_Power;
+    fbReset     : MC_Reset;
+    fbStop      : MC_Stop;
+    fbMoveAbs   : MC_MoveAbsolute;
+    fbMoveVel   : MC_MoveVelocity;
+
+    // --- Internal Status Tracking ---
+    bEnableCmd  : BOOL; // Linked to P_Enabled
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// 1. Always Update the Axis Status
+Axis.ReadStatus();
+
+// 2. Power Control (Torque on/off)
+fbPower(
+    Axis := Axis,
+    Enable := bEnableCmd,
+    Enable_Positive := bEnableCmd,
+    Enable_Negative := bEnableCmd
+);
+
+// 3. Call the Motion Function Blocks
+// Note: We call them here so they can process their internal state machines
+fbReset(Axis := Axis);
+fbStop(Axis := Axis);
+fbMoveAbs(Axis := Axis);
+fbMoveVel(Axis := Axis);
+
+// =========================================================
+// STEP 14: TRIGGER RESET LOGIC
+// =========================================================
+// After the blocks have been called above, we force the 'Execute' 
+// signals back to FALSE. This ensures that the next time a Method 
+// is called, the block sees a clean FALSE -> TRUE rising edge.
+// =========================================================
+
+fbReset.Execute   := FALSE;
+fbStop.Execute    := FALSE;
+fbMoveAbs.Execute := FALSE;
+fbMoveVel.Execute := FALSE;]]></ST>
+    </Implementation>
+    <Method Name="M_MoveAbs" Id="{91be8eab-f779-49c3-9c91-e8161a59ed82}">
+      <Declaration><![CDATA[METHOD M_MoveAbs : BOOL
+VAR_INPUT
+	(* Target position in mm or degrees*)
+	fPosition	: LREAL;
+	(* Speed for this move*)
+	fVelocity	: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Trigger a rising edge on the internal motion block
+fbMoveAbs.Position := fPosition;
+fbMoveAbs.Velocity := fVelocity;
+fbMoveAbs.Execute := TRUE; 
+
+M_MoveAbs := TRUE; // Return TRUE to show the command was received]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_MoveVel" Id="{37e662dd-1514-4118-a818-f288d90d7c84}">
+      <Declaration><![CDATA[METHOD M_MoveVel : BOOL
+VAR_INPUT
+	(* Speed in mm/s or RPM*)
+	fVelocity	: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbMoveVel.Velocity := fVelocity;
+fbMoveVel.Direction := MC_Positive_Direction;
+fbMoveVel.Execute := TRUE;
+
+M_MoveVel := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_Reset" Id="{b7138b05-71aa-42a5-bcb7-54cd0cd5d5d0}">
+      <Declaration><![CDATA[METHOD M_Reset : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbReset.Execute := TRUE; M_Reset := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_Stop" Id="{a8aa22d7-69f3-4b58-8bbe-8959b5116ba7}">
+      <Declaration><![CDATA[METHOD M_Stop : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbStop.Execute := TRUE; M_Stop := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="P_Busy" Id="{0954bfd9-2a2f-442b-88a7-0fc7aa654616}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY P_Busy : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{af39002d-3e39-450d-9298-2d3614d5dde1}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="P_Enabled" Id="{aa86077e-a730-425c-9d71-e45f00711c2b}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY P_Enabled : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{92730983-4549-44bf-8946-dcdf46ccfe10}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a6e6e813-1d0d-42b7-b058-ad03723ae751}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="P_Error" Id="{dc88c766-3499-41ab-b41f-3c6f5290d649}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY P_Error : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{a36b31b8-1fee-448b-b160-4c3cf7dd54df}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="P_Ready" Id="{614d4749-6d6c-42bf-a79f-dfd89216bbcd}">
+      <Declaration><![CDATA[{warning 'Add property implementation'}
+PROPERTY P_Ready : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{9697a46b-6c06-4d27-8b82-b857d1608699}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>
