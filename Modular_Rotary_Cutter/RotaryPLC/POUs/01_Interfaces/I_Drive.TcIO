@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_Drive" Id="{bac1fedb-add2-4ee9-b6e6-a090fe2bb612}">
+    <Declaration><![CDATA[INTERFACE I_Drive
+]]></Declaration>
+    <Method Name="M_MoveAbs" Id="{dd77af82-b0a4-48da-a076-c4140e59b2e0}">
+      <Declaration><![CDATA[METHOD M_MoveAbs : BOOL
+VAR_INPUT
+    fPosition : LREAL; // Target position in mm or degrees
+    fVelocity : LREAL; // Speed for this move
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="M_MoveVel" Id="{96debd5f-4fc8-450d-b944-51a9099b3993}">
+      <Declaration><![CDATA[METHOD M_MoveVel : BOOL
+VAR_INPUT
+    fVelocity : LREAL; // Speed in mm/s or RPM
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="M_Reset" Id="{c038a8fe-c703-45b7-a21c-6003194c8028}">
+      <Declaration><![CDATA[METHOD M_Reset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="M_Stop" Id="{d0446528-b54f-429e-9648-2847bcd2375c}">
+      <Declaration><![CDATA[METHOD M_Stop : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="P_Busy" Id="{4f7370ed-5031-445d-b4e4-3dfd735989e5}">
+      <Declaration><![CDATA[PROPERTY P_Busy : BOOL]]></Declaration>
+      <Get Name="Get" Id="{9c69d565-c6d0-4e09-9883-0f4cdb58c5be}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="P_Enabled" Id="{df317725-f34a-4c84-b136-bfef60668404}">
+      <Declaration><![CDATA[PROPERTY P_Enabled : BOOL]]></Declaration>
+      <Get Name="Get" Id="{31f363a8-2f4c-425c-b929-024e77eb7c25}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{1aeb234b-677e-4bdd-bdd6-9796b2ebfe8d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="P_Error" Id="{66187986-7ec2-4899-8ce5-d4eef857d2e5}">
+      <Declaration><![CDATA[PROPERTY P_Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{6336c5d8-1650-487f-91d5-8116a0bd4284}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="P_Ready" Id="{fb1f186b-f398-43e4-a159-720f403e7051}">
+      <Declaration><![CDATA[PROPERTY P_Ready : BOOL]]></Declaration>
+      <Get Name="Get" Id="{59af60eb-274d-4b58-859e-627e317109bb}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+  </Itf>
+</TcPlcObject>
