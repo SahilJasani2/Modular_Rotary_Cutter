@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_RotaryKnife" Id="{48fb6193-f953-456c-9937-b4916335cb68}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RotaryKnife
+VAR
+    // Hardware Link
+    iMotor          : I_Drive;
+    
+    // Configuration
+    fKnifeDiameter  : LREAL := 100.0; // mm
+    
+    // Commands & Status
+    bEnable         : BOOL;
+    bIsSynchronized : BOOL;
+    bError          : BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// 1. Safety Check: Make sure a motor is actually assigned to this module
+IF iMotor <> 0 THEN
+    
+    // 2. Control the Motor Power
+    iMotor.P_Enabled := bEnable;
+    
+    // 3. Monitor for Errors
+    bError := iMotor.P_Error;
+
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

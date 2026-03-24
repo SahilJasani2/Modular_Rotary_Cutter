@@ -33,6 +33,12 @@
     <Compile Include="POUs\02_Hardware_Wrappers\FB_Drive.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\03_Modules\FB_InfeedConveyor.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\03_Modules\FB_RotaryKnife.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
