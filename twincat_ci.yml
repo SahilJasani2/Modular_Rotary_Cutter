@@ -1,0 +1,32 @@
+name: TwinCAT TcUnit CI Pipeline
+
+# 1. Triggers: When does this pipeline run?
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    # 2. The Runner: TwinCAT requires a Real-Time OS. 
+    # We specify a 'self-hosted' runner, assuming a local Beckhoff IPC is connected to this repo.
+    runs-on: [self-hosted, windows, twincat]
+
+    steps:
+    # Step A: Pull the latest code from GitHub onto the IPC
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # Step B: Compile the PLC project using the Visual Studio CLI (devenv)
+    - name: Build TwinCAT Solution
+      run: |
+        echo "Building TwinCAT Solution..."
+        devenv "Modular_Rotary_Cutter\Modular_Rotary_Cutter.sln" /Build "Release|TwinCAT RT (x64)"
+
+    # Step C: Run the Unit Tests. 
+    # In industry, we use the open-source 'TcUnit-Runner' to execute tests via the local AMS NetID.
+    - name: Execute TcUnit Tests
+      run: |
+        echo "Executing TcUnit-Runner..."
+        TcUnit-Runner.exe -t 127.0.0.1.1.1 -c "Modular_Rotary_Cutter"

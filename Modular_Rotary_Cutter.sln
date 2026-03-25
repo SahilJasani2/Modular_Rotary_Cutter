@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3BC3DD8B-4FD9-46C7-9B5B-80ED9EDDFBD1}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		twincat_ci.yml = twincat_ci.yml
 	EndProjectSection
 EndProject
 Global
