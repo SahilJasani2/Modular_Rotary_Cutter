@@ -7,7 +7,47 @@ VAR
     Sensor : FB_DigitalSensor;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[]]></ST>
+      <ST><![CDATA[// Call the test methods here
+Test_RisingEdge();]]></ST>
     </Implementation>
+    <Method Name="Test_RisingEdge" Id="{67beaa07-254e-421e-ab1a-401689c719f9}">
+      <Declaration><![CDATA[METHOD Test_RisingEdge : REFERENCE TO FB_Test
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// 1. Tell TcUnit we are starting a specific test
+TEST('Test_RisingEdge');
+
+// 2. Cycle 1: Ensure the sensor starts clear (False)
+Sensor.bRawInput := FALSE;
+Sensor(); 
+
+// 3. Cycle 2: A chicken arrives! (Input goes True)
+// This creates the rising edge.
+Sensor.bRawInput := TRUE;
+Sensor(); 
+
+// 4. Verification 1: Did the property trigger?
+// AssertTrue will fail the test if the condition is not met.
+AssertTrue(
+    Condition := Sensor.P_RisingEdge,
+    Message   := 'FAILED: Rising edge did not trigger when input went high!'
+);
+
+// 5. Cycle 3: The chicken is still blocking the sensor
+// We run the block one more time. The rising edge should disappear.
+Sensor();
+
+// 6. Verification 2: Did it act like a one-shot?
+AssertFalse(
+    Condition := Sensor.P_RisingEdge,
+    Message   := 'FAILED: Rising edge stayed true for more than one cycle!'
+);
+
+// 7. Tell TcUnit this test is complete
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
   </POU>
 </TcPlcObject>

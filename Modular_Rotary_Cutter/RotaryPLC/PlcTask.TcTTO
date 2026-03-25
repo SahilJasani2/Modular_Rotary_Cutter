@@ -7,11 +7,13 @@
     <PouCall>
       <Name>MAIN</Name>
     </PouCall>
+    <PouCall>
+      <Name>PRG_TESTS</Name>
+    </PouCall>
     <TaskFBGuid>{adfa4ce6-5a9b-47bd-b9aa-18a9006a33b4}</TaskFBGuid>
     <Fb_init>{0046aee2-44bc-4ae1-bd2a-23d9c217bede}</Fb_init>
     <Fb_exit>{179549be-113d-4898-83f1-d5f083cf7b0b}</Fb_exit>
     <CycleUpdate>{fa406383-6b60-432e-b46e-66c7e729826c}</CycleUpdate>
     <PostCycleUpdate>{c29c4abc-9a6c-4acd-9011-dd70fed92510}</PostCycleUpdate>
-    <ObjectProperties />
   </Task>
 </TcPlcObject>
