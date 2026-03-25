@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="PRG_TESTS" Id="{41a4f515-a6f7-46c3-a9c6-f5a4d8f8a294}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_TESTS
+VAR
+    // We declare an instance of our test suite here
+    DigitalSensorTest : FB_DigitalSensor_Test;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// This is the master command that tells TcUnit to run all tests and print the results
+TcUnit.RUN();]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

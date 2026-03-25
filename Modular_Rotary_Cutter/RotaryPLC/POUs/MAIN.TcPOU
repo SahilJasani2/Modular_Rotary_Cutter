@@ -1,13 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
-  <POU Name="MAIN" Id="{4d0baa44-d475-46c3-a965-e7a9bb8474bf}">
+  <POU Name="MAIN" Id="{4d0baa44-d475-46c3-a965-e7a9bb8474bf}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
-END_VAR
-]]>
-    </Declaration>
+    // This is the single instance of our entire modular machine.
+    // By keeping it here, we keep the global namespace perfectly clean.
+    RotaryCutter : FB_MainMachine;
+END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[]]></ST>
+      <ST><![CDATA[// Execute the main state machine every PLC cycle
+RotaryCutter();]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

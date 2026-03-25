@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_DigitalSensor_Test" Id="{debe6a43-ef40-42e3-9cbd-7e66ae9fa4e4}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DigitalSensor_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    // The actual sensor we are going to test
+    Sensor : FB_DigitalSensor;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

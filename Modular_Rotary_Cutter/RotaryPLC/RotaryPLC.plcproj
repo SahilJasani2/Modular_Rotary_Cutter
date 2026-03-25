@@ -45,6 +45,12 @@
     <Compile Include="POUs\04_Machine_Logic\FB_MainMachine.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\05_Tests\FB_DigitalSensor_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\05_Tests\PRG_TESTS.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -56,6 +62,7 @@
     <Folder Include="POUs\02_Hardware_Wrappers" />
     <Folder Include="POUs\03_Modules" />
     <Folder Include="POUs\04_Machine_Logic" />
+    <Folder Include="POUs\05_Tests" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
   </ItemGroup>
@@ -76,6 +83,10 @@
       <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_Module</Namespace>
       <SystemLibrary>true</SystemLibrary>
+    </PlaceholderReference>
+    <PlaceholderReference Include="TcUnit">
+      <DefaultResolution>TcUnit, * (www.tcunit.org)</DefaultResolution>
+      <Namespace>TcUnit</Namespace>
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
