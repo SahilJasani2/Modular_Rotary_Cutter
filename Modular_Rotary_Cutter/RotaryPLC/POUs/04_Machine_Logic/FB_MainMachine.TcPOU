@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_MainMachine" Id="{7d03d295-f101-4685-8cbf-a1d2f35ed8c9}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MainMachine
+VAR
+    // --- The Physical Modules ---
+    // Here we actually build the machine out of our Lego bricks
+    InfeedConveyor  : FB_InfeedConveyor;
+    RotaryKnife     : FB_RotaryKnife;
+
+    // --- State Machine Tracking ---
+    // We start in the STOPPED state by default for safety
+    eState          : E_MachineState := E_MachineState.STOPPED;
+
+    // --- Operator Commands (From an HMI or Pushbuttons) ---
+    bCmdStart       : BOOL;
+    bCmdStop        : BOOL;
+    bCmdReset       : BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// =========================================================
+// 1. THE MAIN STATE MACHINE
+// =========================================================
+CASE eState OF
+
+    E_MachineState.STOPPED:
+        // The machine is safe and waiting.
+        // If the operator presses Start, we change state.
+        IF bCmdStart THEN
+            bCmdStart := FALSE; // Reset the button
+            eState := E_MachineState.STARTING;
+        END_IF
+
+    E_MachineState.STARTING:
+        // Here we will eventually turn on the motors.
+        // For right now, we will just pass straight through to EXECUTE.
+        eState := E_MachineState.EXECUTE;
+
+    E_MachineState.EXECUTE:
+        // The machine is running normally.
+        // If the operator presses Stop, we change to STOPPING.
+        IF bCmdStop THEN
+            bCmdStop := FALSE; // Reset the button
+            eState := E_MachineState.STOPPING;
+        END_IF
+
+    E_MachineState.STOPPING:
+        // Here we will eventually command all motors to halt.
+        // For right now, just pass straight through to STOPPED.
+        eState := E_MachineState.STOPPED;
+
+    E_MachineState.ERROR:
+        // Something broke. Wait for the operator to acknowledge.
+        IF bCmdReset THEN
+            bCmdReset := FALSE; // Reset the button
+            eState := E_MachineState.STOPPED;
+        END_IF
+
+END_CASE
+
+// =========================================================
+// 2. ALWAYS CALL THE MODULES
+// =========================================================
+// No matter what state we are in, the modules must be called every cycle 
+// so they can read sensors and update their own internal faults.
+InfeedConveyor();
+RotaryKnife();]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

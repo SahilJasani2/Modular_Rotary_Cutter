@@ -42,6 +42,9 @@
     <Compile Include="POUs\03_Modules\FB_RotaryKnife.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\04_Machine_Logic\FB_MainMachine.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
