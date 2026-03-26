@@ -3,7 +3,7 @@ import time
 import random
 
 # ==============================================================================
-# DIGITAL TWIN PHYSICS SIMULATION - SOURCE CODE VERIFIED
+# DIGITAL TWIN PHYSICS SIMULATION - CLOSED LOOP VERIFICATION
 # ==============================================================================
 
 AMS_NET_ID = '199.4.42.250.1.1'
@@ -38,14 +38,36 @@ def run_simulation():
                 # TRIGGER THE SENSOR 
                 # Updated Path: MAIN -> RotaryCutter -> fbProductSensor -> bRawInput
                 sensor_path = "MAIN.RotaryCutter.fbProductSensor.bRawInput"
+                cmd_path = "MAIN.RotaryCutter.RotaryKnife.bSyncCommand"
                 
                 print(f"[SENSOR] ---> Material Detected! (Path: {sensor_path})")
                 plc.write_by_name(sensor_path, True, pyads.PLCTYPE_BOOL)
                 
-                time.sleep(0.7) # Simulated width of the workpiece
+                # Give the PLC a fraction of a second to run its cycle and react
+                time.sleep(0.1)
+                
+                # VERIFICATION 1: Read the chop command back from the PLC
+                did_it_chop = plc.read_by_name(cmd_path, pyads.PLCTYPE_BOOL)
+                if did_it_chop:
+                    print("   ✅ VERIFIED: PLC responded with 'bSyncCommand = TRUE'. Cut initiated!")
+                else:
+                    print("   ❌ ERROR: No cut command received from PLC.")
+                
+                # Simulated width of the workpiece (the rest of the material passes)
+                time.sleep(0.6) 
                 
                 print("[SENSOR] ---> Material Passed.")
                 plc.write_by_name(sensor_path, False, pyads.PLCTYPE_BOOL)
+                
+                # Give the PLC a fraction of a second to run its cycle and react
+                time.sleep(0.1)
+                
+                # VERIFICATION 2: Check if the PLC turned the chop command off
+                is_chopping = plc.read_by_name(cmd_path, pyads.PLCTYPE_BOOL)
+                if not is_chopping:
+                    print("   ✅ VERIFIED: PLC responded with 'bSyncCommand = FALSE'. Ready for next cut.")
+                else:
+                    print("   ❌ ERROR: Knife is still locked!")
                 
             else:
                 print(f"[STATUS] Current State: {state} (Waiting for EXECUTE/30...)")

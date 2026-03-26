@@ -2,27 +2,29 @@
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_RotaryKnife" Id="{48fb6193-f953-456c-9937-b4916335cb68}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RotaryKnife
-VAR
+VAR_INPUT
     // --- Hardware Link ---
     iMotor          : I_Drive; // The motor that spins the blade
     
+    // --- NEW: Commands from Main Machine ---
+    bEnable         : BOOL; // Torque on/off
+    bSyncCommand    : BOOL; // Request to 'Lock' to the conveyor
+END_VAR
+VAR
     // --- Master Reference ---
-    // We use a REFERENCE so we don't copy the whole Axis structure
-    pMasterAxis     : REFERENCE TO AXIS_REF; 
+    pMasterAxis     : REFERENCE TO AXIS_REF;
     
     // --- Motion Control Blocks ---
     fbGearIn        : MC_GearIn;
     fbGearOut       : MC_GearOut;
     
     // --- Configuration ---
-    fKnifeDiameter  : LREAL := 100.0; // mm
-    fGearRatio      : LREAL := 1.0;   // 1:1 speed matching
+    fKnifeDiameter  : LREAL := 100.0;
+    fGearRatio      : LREAL := 1.0;
     
-    // --- Commands & Status ---
-    bEnable         : BOOL;  // Torque on/off
-    bSyncCommand    : BOOL;  // Request to 'Lock' to the conveyor
-    bIsSynchronized : BOOL;  // Feedback that we are locked
-    bError          : BOOL;  // Fault status
+    // --- Status ---
+    bIsSynchronized : BOOL; // Feedback that we are locked
+    bError          : BOOL; // Fault status
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// 1. Safety Check: Only run if a motor has been assigned

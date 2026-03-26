@@ -108,8 +108,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="P_Busy" Id="{0954bfd9-2a2f-442b-88a7-0fc7aa654616}">
-      <Declaration><![CDATA[{warning 'Add property implementation'}
-PROPERTY P_Busy : BOOL
+      <Declaration><![CDATA[PROPERTY P_Busy : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{af39002d-3e39-450d-9298-2d3614d5dde1}">
         <Declaration><![CDATA[VAR
@@ -122,8 +121,7 @@ P_Busy := Axis.Status.Moving OR fbMoveAbs.Busy OR fbMoveVel.Busy;]]></ST>
       </Get>
     </Property>
     <Property Name="P_Enabled" Id="{aa86077e-a730-425c-9d71-e45f00711c2b}">
-      <Declaration><![CDATA[{warning 'Add property implementation'}
-PROPERTY P_Enabled : BOOL
+      <Declaration><![CDATA[PROPERTY P_Enabled : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{92730983-4549-44bf-8946-dcdf46ccfe10}">
         <Declaration><![CDATA[VAR
@@ -143,8 +141,7 @@ END_VAR
       </Set>
     </Property>
     <Property Name="P_Error" Id="{dc88c766-3499-41ab-b41f-3c6f5290d649}">
-      <Declaration><![CDATA[{warning 'Add property implementation'}
-PROPERTY P_Error : BOOL
+      <Declaration><![CDATA[PROPERTY P_Error : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{a36b31b8-1fee-448b-b160-4c3cf7dd54df}">
         <Declaration><![CDATA[VAR
@@ -156,15 +153,14 @@ END_VAR
       </Get>
     </Property>
     <Property Name="P_Ready" Id="{614d4749-6d6c-42bf-a79f-dfd89216bbcd}">
-      <Declaration><![CDATA[{warning 'Add property implementation'}
-PROPERTY P_Ready : BOOL
+      <Declaration><![CDATA[PROPERTY P_Ready : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{9697a46b-6c06-4d27-8b82-b857d1608699}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[P_Ready := Axis.Status.Ready;]]></ST>
+          <ST><![CDATA[P_Ready := Axis.Status.Operational;]]></ST>
         </Implementation>
       </Get>
     </Property>

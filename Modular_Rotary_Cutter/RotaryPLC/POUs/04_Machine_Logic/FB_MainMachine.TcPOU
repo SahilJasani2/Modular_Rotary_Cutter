@@ -7,9 +7,14 @@ VAR
     InfeedConveyor  : FB_InfeedConveyor;
     RotaryKnife     : FB_RotaryKnife;
     
+    // --- NEW: The Virtual Motors ---
+    // These are the "digital" motors that will do the spinning!
+    ConveyorMotor   : FB_Drive;
+    KnifeMotor      : FB_Drive;
+    
     // --- Concrete Hardware Instances for Simulation ---
     // Python (ADS) will talk to this specific instance
-    fbProductSensor : FB_DigitalSensor; 
+    fbProductSensor : FB_DigitalSensor;
 
     // --- Edge/IoT Telemetry ---
     EdgeGateway     : FB_Telemetry;
@@ -27,10 +32,11 @@ END_VAR]]></Declaration>
 // 0. HARDWARE LINKING (The Digital Twin Bridge)
 // =========================================================
 // We "plug" our concrete sensor into the Conveyor's interface.
-// This allows Python to write to fbProductSensor.bRawInput
-// and the Conveyor will see it through its iProductCam interface.
 InfeedConveyor.iProductCam := fbProductSensor;
 
+// We "plug" our virtual motors into the machine modules
+InfeedConveyor.iMotor := ConveyorMotor;
+RotaryKnife.iMotor    := KnifeMotor;
 
 // =========================================================
 // 1. THE MAIN STATE MACHINE
@@ -39,7 +45,7 @@ CASE eState OF
 
     E_MachineState.STOPPED:
         IF bCmdStart THEN
-            bCmdStart := FALSE; 
+            bCmdStart := FALSE;
             eState := E_MachineState.STARTING;
         END_IF
 
@@ -47,8 +53,25 @@ CASE eState OF
         eState := E_MachineState.EXECUTE;
 
     E_MachineState.EXECUTE:
+        // 1. Turn on the power to the Knife
+        RotaryKnife.bEnable := TRUE;
+
+        // 2. THE NINJA CHOP! 
+        // When the sensor detects the material (Rising Edge), lock the knife to the belt
+        IF fbProductSensor.P_RisingEdge THEN
+            RotaryKnife.bSyncCommand := TRUE;
+        END_IF
+        
+        // When the material passes (Falling Edge), unlock the knife
+        IF fbProductSensor.P_FallingEdge THEN
+            RotaryKnife.bSyncCommand := FALSE;
+        END_IF
+
+        // 3. Stop Command Logic
         IF bCmdStop THEN
-            bCmdStop := FALSE; 
+            bCmdStop := FALSE;
+            RotaryKnife.bEnable := FALSE;
+            RotaryKnife.bSyncCommand := FALSE;
             eState := E_MachineState.STOPPING;
         END_IF
 
@@ -57,15 +80,23 @@ CASE eState OF
 
     E_MachineState.ERROR:
         IF bCmdReset THEN
-            bCmdReset := FALSE; 
+            bCmdReset := FALSE;
             eState := E_MachineState.STOPPED;
         END_IF
 
 END_CASE
 
 // =========================================================
-// 2. ALWAYS CALL THE MODULES
+// 2. ALWAYS CALL THE MODULES AND MOTORS
 // =========================================================
+// ---> NEW: UPDATE THE SENSOR! (This calculates the Rising/Falling edges) <---
+fbProductSensor();
+
+// Run the motors so they process their internal math
+ConveyorMotor();
+KnifeMotor();
+
+// Run the main machine logic
 InfeedConveyor();
 RotaryKnife();
 
