@@ -10,7 +10,7 @@ import random
 # ==============================================================================
 
 # TwinCAT 3 Local AMS NetID and standard PLC Port (851)
-AMS_NET_ID = '127.0.0.1.1.1'
+AMS_NET_ID = '199.4.42.250.1.1'
 PLC_PORT = pyads.PORT_TC3PLC1
 
 def run_simulation():
