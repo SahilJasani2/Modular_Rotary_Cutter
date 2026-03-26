@@ -71,6 +71,25 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Property Name="P_RawInput" Id="{1888c39b-44a9-4695-9d1c-9125368feed5}">
+      <Declaration><![CDATA[PROPERTY P_RawInput : BOOL]]></Declaration>
+      <Get Name="Get" Id="{b87ac34c-a466-45f9-9db9-d1c61bf882ca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[P_RawInput := bRawInput;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{ef2d70ca-93e8-45c7-890a-8f169738602f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bRawInput := P_RawInput;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="P_RisingEdge" Id="{1f8356ea-8544-48ad-887b-04c9041b4561}">
       <Declaration><![CDATA[PROPERTY P_RisingEdge : BOOL
 ]]></Declaration>

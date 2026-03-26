@@ -2,14 +2,14 @@
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_InfeedConveyor" Id="{bd972d02-828a-4a6c-9ef5-f96cad8432c6}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_InfeedConveyor
-VAR
-    // We use the Interfaces here. This is "Dependency Injection" light.
-    // It means this conveyor can work with ANY drive and ANY sensor.
+VAR_INPUT
+    // Moving these to VAR_INPUT makes them "plugs" we can use from outside
     iMotor      : I_Drive; 
     iProductCam : I_DigitalSensor;
-    
-    // Internal Status
-    fTargetVelocity : LREAL := 100.0; // Default speed mm/s
+END_VAR
+VAR
+    // Internal status stays private
+    fTargetVelocity : LREAL := 100.0; 
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// The conveyor is very simple for now. 

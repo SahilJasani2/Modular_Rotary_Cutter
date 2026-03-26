@@ -3,61 +3,56 @@ import time
 import random
 
 # ==============================================================================
-# DIGITAL TWIN PHYSICS SIMULATION
-# This script bridges the gap between the IT environment and the Real-Time PLC.
-# It uses the Beckhoff ADS protocol to simulate physical workpieces moving 
-# down the Infeed Conveyor and triggering the Digital Photo-Eye.
+# DIGITAL TWIN PHYSICS SIMULATION - SOURCE CODE VERIFIED
 # ==============================================================================
 
-# TwinCAT 3 Local AMS NetID and standard PLC Port (851)
 AMS_NET_ID = '199.4.42.250.1.1'
 PLC_PORT = pyads.PORT_TC3PLC1
 
 def run_simulation():
-    print("--- Starting Flying Shear / Rotary Cutter Digital Twin ---")
+    print("--- Starting Industrial Rotary Cutter Digital Twin ---")
     
-    # 1. Open Connection to the PLC
     plc = pyads.Connection(AMS_NET_ID, PLC_PORT)
     try:
         plc.open()
         print(f"[SUCCESS] Connected to TwinCAT PLC. State: {plc.read_state()}")
         
-        # 2. Command the Machine to Start
+        # 1. Trigger the Start Button
+        # Path verified: MAIN -> RotaryCutter -> bCmdStart
         print("[HMI] Pressing 'Start' Button...")
         plc.write_by_name("MAIN.RotaryCutter.bCmdStart", True, pyads.PLCTYPE_BOOL)
-        time.sleep(1) # Let the PLC state machine process the command
+        time.sleep(1.0) 
         
-        # 3. Main Physics Loop
+        # 2. Main Simulation Loop
         print("[SIMULATION] Conveyor physics loop running. Press Ctrl+C to stop.")
         while True:
-            # Read the current state of the machine from the PLC
+            # Read current machine state (30 = EXECUTE)
             state = plc.read_by_name("MAIN.RotaryCutter.eState", pyads.PLCTYPE_INT)
             
-            # PackML State 30 = EXECUTE (Running)
             if state == 30: 
                 print("\n[PHYSICS] Conveyor is moving. Material is feeding...")
                 
-                # Wait a random amount of time to simulate distance between products
+                # Wait for material to reach the sensor
                 time.sleep(random.uniform(2.0, 4.0)) 
                 
-                # TRIGGER THE SENSOR (Workpiece leading edge blocks the laser)
-                print("[SENSOR] ---> Workpiece Leading Edge Detected! (Rising Edge)")
-                plc.write_by_name("MAIN.RotaryCutter.InfeedConveyor.ProductSensor.bRawInput", True, pyads.PLCTYPE_BOOL)
+                # TRIGGER THE SENSOR 
+                # Updated Path: MAIN -> RotaryCutter -> fbProductSensor -> bRawInput
+                sensor_path = "MAIN.RotaryCutter.fbProductSensor.bRawInput"
                 
-                # Wait 0.5 seconds (the time it takes the physical workpiece to pass the laser)
-                time.sleep(0.5)
+                print(f"[SENSOR] ---> Material Detected! (Path: {sensor_path})")
+                plc.write_by_name(sensor_path, True, pyads.PLCTYPE_BOOL)
                 
-                # CLEAR THE SENSOR (Workpiece trailing edge has passed)
-                print("[SENSOR] ---> Workpiece Trailing Edge Passed. (Falling Edge)")
-                plc.write_by_name("MAIN.RotaryCutter.InfeedConveyor.ProductSensor.bRawInput", False, pyads.PLCTYPE_BOOL)
+                time.sleep(0.7) # Simulated width of the workpiece
+                
+                print("[SENSOR] ---> Material Passed.")
+                plc.write_by_name(sensor_path, False, pyads.PLCTYPE_BOOL)
                 
             else:
-                print(f"[STATUS] Machine is not in EXECUTE state (Current State: {state}). Waiting...")
+                print(f"[STATUS] Current State: {state} (Waiting for EXECUTE/30...)")
                 time.sleep(2)
 
     except Exception as e:
         print(f"\n[ERROR] ADS Communication failed: {e}")
-        print("Make sure your TwinCAT PLC is in RUN mode (Green Gear icon).")
     finally:
         plc.close()
         print("\n--- Connection Closed ---")

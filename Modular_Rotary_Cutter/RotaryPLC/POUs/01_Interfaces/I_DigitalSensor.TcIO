@@ -24,6 +24,15 @@
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
+    <Property Name="P_RawInput" Id="{b9c6f002-2e59-4f1f-a26e-70ee5492da0d}">
+      <Declaration><![CDATA[PROPERTY P_RawInput : BOOL]]></Declaration>
+      <Get Name="Get" Id="{0c1a066c-6b10-493f-9992-2275c6068240}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{a8f7c5f7-12b0-44ba-8fb8-129959c92aca}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="P_RisingEdge" Id="{f52a9598-e36f-4892-97b1-79ba6c72a93d}">
       <Declaration><![CDATA[PROPERTY P_RisingEdge : BOOL]]></Declaration>
       <Get Name="Get" Id="{c02428f4-e925-4cf0-92c9-d7a48d48423b}">

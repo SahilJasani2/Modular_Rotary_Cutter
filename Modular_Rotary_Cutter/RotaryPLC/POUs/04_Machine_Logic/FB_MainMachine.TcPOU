@@ -4,59 +4,60 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MainMachine
 VAR
     // --- The Physical Modules ---
-    // Here we actually build the machine out of our Lego bricks
     InfeedConveyor  : FB_InfeedConveyor;
     RotaryKnife     : FB_RotaryKnife;
+    
+    // --- Concrete Hardware Instances for Simulation ---
+    // Python (ADS) will talk to this specific instance
+    fbProductSensor : FB_DigitalSensor; 
 
     // --- Edge/IoT Telemetry ---
-    // This handles sending our machine data to the cloud/broker
     EdgeGateway     : FB_Telemetry;
 
     // --- State Machine Tracking ---
-    // We start in the STOPPED state by default for safety
     eState          : E_MachineState := E_MachineState.STOPPED;
 
-    // --- Operator Commands (From an HMI or Pushbuttons) ---
+    // --- Operator Commands ---
     bCmdStart       : BOOL;
     bCmdStop        : BOOL;
     bCmdReset       : BOOL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// =========================================================
+// 0. HARDWARE LINKING (The Digital Twin Bridge)
+// =========================================================
+// We "plug" our concrete sensor into the Conveyor's interface.
+// This allows Python to write to fbProductSensor.bRawInput
+// and the Conveyor will see it through its iProductCam interface.
+InfeedConveyor.iProductCam := fbProductSensor;
+
+
+// =========================================================
 // 1. THE MAIN STATE MACHINE
 // =========================================================
 CASE eState OF
 
     E_MachineState.STOPPED:
-        // The machine is safe and waiting.
-        // If the operator presses Start, we change state.
         IF bCmdStart THEN
-            bCmdStart := FALSE; // Reset the button
+            bCmdStart := FALSE; 
             eState := E_MachineState.STARTING;
         END_IF
 
     E_MachineState.STARTING:
-        // Here we will eventually turn on the motors.
-        // For right now, we will just pass straight through to EXECUTE.
         eState := E_MachineState.EXECUTE;
 
     E_MachineState.EXECUTE:
-        // The machine is running normally.
-        // If the operator presses Stop, we change to STOPPING.
         IF bCmdStop THEN
-            bCmdStop := FALSE; // Reset the button
+            bCmdStop := FALSE; 
             eState := E_MachineState.STOPPING;
         END_IF
 
     E_MachineState.STOPPING:
-        // Here we will eventually command all motors to halt.
-        // For right now, just pass straight through to STOPPED.
         eState := E_MachineState.STOPPED;
 
     E_MachineState.ERROR:
-        // Something broke. Wait for the operator to acknowledge.
         IF bCmdReset THEN
-            bCmdReset := FALSE; // Reset the button
+            bCmdReset := FALSE; 
             eState := E_MachineState.STOPPED;
         END_IF
 
@@ -65,15 +66,12 @@ END_CASE
 // =========================================================
 // 2. ALWAYS CALL THE MODULES
 // =========================================================
-// No matter what state we are in, the modules must be called every cycle 
-// so they can read sensors and update their own internal faults.
 InfeedConveyor();
 RotaryKnife();
 
 // =========================================================
 // 3. TELEMETRY & CLOUD SYNC
 // =========================================================
-// Pass the current machine state to our IoT gateway module
 EdgeGateway(eCurrentState := eState);]]></ST>
     </Implementation>
   </POU>
