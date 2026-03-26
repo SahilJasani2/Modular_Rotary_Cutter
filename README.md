@@ -20,8 +20,6 @@ The codebase is structured to ensure maximum modularity and hardware independenc
 
 ```mermaid
 classDiagram
-    direction TB
-    
     class MAIN {
         +RotaryCutter : FB_MainMachine
     }
@@ -46,13 +44,13 @@ classDiagram
     }
 
     class I_DigitalSensor {
-        <<Interface>>
+        <<interface>>
         +P_RisingEdge : BOOL
         +P_RawInput : BOOL
     }
 
     class I_Drive {
-        <<Interface>>
+        <<interface>>
         +M_MoveAbs()
         +M_MoveVel()
         +M_Stop()
@@ -72,12 +70,10 @@ classDiagram
     FB_MainMachine *-- FB_InfeedConveyor : Orchestrates
     FB_MainMachine *-- FB_RotaryKnife : Orchestrates
     
-    %% Interface Connections
     FB_InfeedConveyor --> I_DigitalSensor : Requires
     FB_InfeedConveyor --> I_Drive : Requires
     FB_RotaryKnife --> I_Drive : Requires
     
-    %% Hardware Implementations
     FB_DigitalSensor ..|> I_DigitalSensor : Implements
     FB_Drive ..|> I_Drive : Implements
 ```
