@@ -8,6 +8,10 @@ VAR
     InfeedConveyor  : FB_InfeedConveyor;
     RotaryKnife     : FB_RotaryKnife;
 
+    // --- Edge/IoT Telemetry ---
+    // This handles sending our machine data to the cloud/broker
+    EdgeGateway     : FB_Telemetry;
+
     // --- State Machine Tracking ---
     // We start in the STOPPED state by default for safety
     eState          : E_MachineState := E_MachineState.STOPPED;
@@ -64,7 +68,13 @@ END_CASE
 // No matter what state we are in, the modules must be called every cycle 
 // so they can read sensors and update their own internal faults.
 InfeedConveyor();
-RotaryKnife();]]></ST>
+RotaryKnife();
+
+// =========================================================
+// 3. TELEMETRY & CLOUD SYNC
+// =========================================================
+// Pass the current machine state to our IoT gateway module
+EdgeGateway(eCurrentState := eState);]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

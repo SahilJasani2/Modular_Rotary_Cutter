@@ -51,6 +51,9 @@
     <Compile Include="POUs\05_Tests\PRG_TESTS.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\06_IoT_Edge\FB_Telemetry.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -63,6 +66,7 @@
     <Folder Include="POUs\03_Modules" />
     <Folder Include="POUs\04_Machine_Logic" />
     <Folder Include="POUs\05_Tests" />
+    <Folder Include="POUs\06_IoT_Edge" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
   </ItemGroup>
@@ -78,6 +82,10 @@
     <PlaceholderReference Include="Tc2_System">
       <DefaultResolution>Tc2_System, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_System</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_IotBase">
+      <DefaultResolution>Tc3_IotBase, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_IotBase</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc3_Module">
       <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>

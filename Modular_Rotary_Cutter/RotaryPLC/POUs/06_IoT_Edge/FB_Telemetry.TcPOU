@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_Telemetry" Id="{ca453298-1f6a-4f29-afba-4f3775b4c522}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Telemetry
+VAR_INPUT
+    // The main machine will pass its current state in here
+    eCurrentState : E_MachineState; 
+END_VAR
+VAR
+    // The TwinCAT MQTT Client
+    fbMqttClient  : FB_IotMqttClient;
+    
+    // Connection Settings
+    bEnableMqtt   : BOOL := TRUE;
+    sBrokerIp     : STRING(255) := 'broker.hivemq.com'; // Free public testing broker
+    sTopic        : STRING(255) := 'sahil/portfolio/machine/status';
+    
+    // Payload generation
+    sPayload      : STRING(255);
+    fbTimer       : TON; // Timer to publish data every 2 seconds
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// 1. Configure the Client
+fbMqttClient.sHostName := sBrokerIp;
+fbMqttClient.nHostPort := 1883;
+
+// 2. Keep the Client running in the background
+fbMqttClient.Execute(bConnect := bEnableMqtt);
+
+// 3. Timer: Trigger every 2 seconds
+fbTimer(IN := NOT fbTimer.Q, PT := T#2S);
+
+// 4. Publish Data
+IF fbMqttClient.bConnected AND fbTimer.Q THEN
+    
+    // Build a simple JSON string. 
+    // Example output: {"State": 30}
+    sPayload := CONCAT('{"State": ', TO_STRING(eCurrentState));
+    sPayload := CONCAT(sPayload, '}');
+    
+    // Send it to the cloud
+    fbMqttClient.Publish(
+        sTopic       := sTopic, 
+        pPayload     := ADR(sPayload), 
+        nPayloadSize := INT_TO_UDINT(LEN(sPayload)) + 1, 
+        eQoS         := TcIotMqttQos.AtMostOnceDelivery, 
+        bRetain      := FALSE, 
+        bQueue       := FALSE
+    );
+    
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
