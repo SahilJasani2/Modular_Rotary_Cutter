@@ -12,11 +12,11 @@ This project implements a modular, object-oriented control system for a Rotary C
 - **Languages**: Structured Text (IEC 61131-3), Python 3.13
 - **Architecture**: Object-Oriented Programming (OOP), Interface-based Dependency Injection
 - **Communication**: ADS (Automation Device Specification), MQTT (TwinCAT IoT)
-- [cite_start]**Standards**: PackML-inspired State Machine (`E_MachineState`) [cite: 112, 113]
+- **Standards**: PackML-inspired State Machine (`E_MachineState`)
 
 ## 3. System Architecture
 
-The codebase is structured to ensure maximum modularity and hardware independence. [cite_start]Physical hardware is decoupled from the control logic using IEC 61131-3 Interfaces (`I_Drive`, `I_DigitalSensor`) [cite: 8-16, 48, 49].
+The codebase is structured to ensure maximum modularity and hardware independence. Physical hardware is decoupled from the control logic using IEC 61131-3 Interfaces (`I_Drive`, `I_DigitalSensor`).
 
 ```mermaid
 classDiagram
