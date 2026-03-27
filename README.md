@@ -25,22 +25,36 @@ classDiagram
     }
     
     class FB_MainMachine {
+        -eState : E_MachineState
         +InfeedConveyor : FB_InfeedConveyor
         +RotaryKnife : FB_RotaryKnife
-        +ConveyorMotor : FB_Drive
-        +KnifeMotor : FB_Drive
-        +fbProductSensor : FB_DigitalSensor
+        +Telemetry : FB_Telemetry
+        -fbProductSensor : FB_DigitalSensor
+    }
+
+    class E_MachineState {
+        <<enumeration>>
+        IDLE
+        STARTING
+        EXECUTE (30)
+        STOPPING
+        ABORTED
     }
 
     class FB_InfeedConveyor {
-        +iMotor : I_Drive
-        +iProductCam : I_DigitalSensor
+        -iMotor : I_Drive
+        -iProductCam : I_DigitalSensor
     }
 
     class FB_RotaryKnife {
-        +iMotor : I_Drive
+        -iMotor : I_Drive
         +bSyncCommand : BOOL
-        +fbGearIn : MC_GearIn
+        -fbGearIn : MC_GearIn
+    }
+
+    class FB_Telemetry {
+        +PublishState()
+        +MqttClient : FB_IotMqttClient
     }
 
     class I_DigitalSensor {
@@ -63,16 +77,18 @@ classDiagram
     
     class FB_Drive {
         +Axis : AXIS_REF
-        +fbMoveVel : MC_MoveVelocity
+        -fbMoveVel : MC_MoveVelocity
     }
 
     MAIN --> FB_MainMachine : Executes
+    FB_MainMachine --> E_MachineState : Maintains
     FB_MainMachine *-- FB_InfeedConveyor : Orchestrates
     FB_MainMachine *-- FB_RotaryKnife : Orchestrates
+    FB_MainMachine *-- FB_Telemetry : Updates
     
-    FB_InfeedConveyor --> I_DigitalSensor : Requires
-    FB_InfeedConveyor --> I_Drive : Requires
-    FB_RotaryKnife --> I_Drive : Requires
+    FB_InfeedConveyor --> I_DigitalSensor : Dependency Injection
+    FB_InfeedConveyor --> I_Drive : Dependency Injection
+    FB_RotaryKnife --> I_Drive : Dependency Injection
     
     FB_DigitalSensor ..|> I_DigitalSensor : Implements
     FB_Drive ..|> I_Drive : Implements
@@ -99,7 +115,8 @@ To enable "Hardware-in-the-Loop" testing without physical components, a Python s
 The following video demonstrates the full "Closed-Loop" execution of the Rotary Cutter. It showcases the high-speed synchronization between the Python Digital Twin and the TwinCAT 3 PLC.
 
 ### 5.1 Real-Time Execution Trace
-<video src="./docs/rotary_motor_scope_view.mp4" width="100%" controls autoplay loop muted></video>
+
+**[📹 Watch the Rotary Cutter Demonstration (MP4)](./rotary%20motor%20scope%20view.mp4)**
 
 **Python CLI Output (HIL Verification):**
 ![](./docs/Python%20side%20CLI.png)
