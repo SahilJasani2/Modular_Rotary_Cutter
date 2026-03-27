@@ -116,7 +116,7 @@ The following video demonstrates the full "Closed-Loop" execution of the Rotary 
 
 ### 5.1 Real-Time Execution Trace
 
-**[📹 Watch the Rotary Cutter Demonstration (MP4)](./rotary%20motor%20scope%20view.mp4)**
+**[📹 Watch the Rotary Cutter Demonstration (MP4)](./docs/rotary%20motor%20scope%20view.mp4)**
 
 **Python CLI Output (HIL Verification):**
 ![](./docs/Python%20side%20CLI.png)
