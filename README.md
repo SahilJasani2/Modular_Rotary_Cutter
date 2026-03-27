@@ -94,14 +94,37 @@ To enable "Hardware-in-the-Loop" testing without physical components, a Python s
 - **Closed-Loop Verification**: Python synchronously reads the PLC's response (bSyncCommand) immediately after sensor triggering to mathematically verify deterministic motion execution and state transitions.
 - **Abstraction**: The PLC logic interacts strictly with interfaces (I_DigitalSensor), allowing for a seamless transition from the Python simulation directly to physical fieldbus commissioning without code changes.
 
-## 5. IoT & Telemetry
+## 5. System Demonstration & Validation
+
+The following video demonstrates the full "Closed-Loop" execution of the Rotary Cutter. It showcases the high-speed synchronization between the Python Digital Twin and the TwinCAT 3 PLC.
+
+### 5.1 Real-Time Execution Trace
+<video src="./docs/rotary_motor_scope_view.mp4" width="100%" controls autoplay loop muted></video>
+
+**Python CLI Output (HIL Verification):**
+![](./docs/Python%20side%20CLI.png)
+
+**In this demonstration:**
+* **Modular POU Structure**: Note the organized folder hierarchy (`01_Interfaces` through `06_IoT_Edge`) ensuring a clean, maintainable codebase.
+* **Deterministic Logic**: The TwinCAT Scope (Logic Analyzer) shows the **Green Pulse (Edge Detection)** and **Pink Line (Knife Command)** firing in perfect synchronization.
+* **HIL Simulation**: The Python CLI logs confirm that every virtual "Cut" is mathematically verified by reading back the PLC's state via ADS.
+
+### 5.2 Timing Analysis
+| Signal | Description | Logic Proof |
+| :--- | :--- | :--- |
+| **bRawInput** | Python Sensor | Injected via `pyads` at 1ms resolution. |
+| **P_RisingEdge** | Edge Detection | Triggered for exactly one PLC task cycle. |
+| **bSyncCommand** | Motion Trigger | High-speed output for knife synchronization. |
+| **eState** | Machine State | Constant at `30` (Execute), proving logic stability. |
+
+## 6. IoT & Telemetry
 
 A dedicated FB_Telemetry module utilizes the TwinCAT IoT library to publish machine states to an MQTT broker.
 
 - **Broker**: broker.hivemq.com (Default)
 - **Payload**: JSON-formatted machine state and performance metrics sent at 2-second intervals.
 
-## 6. Setup and Deployment
+## 7. Setup and Deployment
 
 ### Prerequisites
 
