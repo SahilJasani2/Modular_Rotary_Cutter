@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{c26b7517-1b67-44c6-88c3-47de44b6e9f6}</ProjectGuid>
+    <AssemblyName>Rotary_Scope</AssemblyName>
+    <Name>Rotary_Scope</Name>
+    <RootNamespace>Rotary_Scope</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="YT Scope Project.tcscopex">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+</Project>
