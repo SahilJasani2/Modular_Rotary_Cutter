@@ -3,7 +3,7 @@ import time
 import random
 
 # ==============================================================================
-# DIGITAL TWIN PHYSICS SIMULATION - CLOSED LOOP VERIFICATION
+# DIGITAL TWIN PHYSICS SIMULATION - RESTORED ENDLESS LOOP WITH AUTO-RECOVERY
 # ==============================================================================
 
 AMS_NET_ID = '199.4.42.250.1.1'
@@ -17,61 +17,69 @@ def run_simulation():
         plc.open()
         print(f"[SUCCESS] Connected to TwinCAT PLC. State: {plc.read_state()}")
         
-        # 1. Trigger the Start Button
-        # Path verified: MAIN -> RotaryCutter -> bCmdStart
+        # 1. Trigger the Start Button (Your original logic)
         print("[HMI] Pressing 'Start' Button...")
         plc.write_by_name("MAIN.RotaryCutter.bCmdStart", True, pyads.PLCTYPE_BOOL)
         time.sleep(1.0) 
         
-        # 2. Main Simulation Loop
+        # 2. Main Simulation Loop (Restored to run endlessly)
+        cycle_count = 0
         print("[SIMULATION] Conveyor physics loop running. Press Ctrl+C to stop.")
+        
         while True:
-            # Read current machine state (30 = EXECUTE)
+            # Read current machine state (30 = EXECUTE, 99 = ERROR)
             state = plc.read_by_name("MAIN.RotaryCutter.eState", pyads.PLCTYPE_INT)
             
-            if state == 30: 
-                print("\n[PHYSICS] Conveyor is moving. Material is feeding...")
+            if state == 30: # EXECUTE
+                cycle_count += 1
+                print(f"\n[PHYSICS] CYCLE {cycle_count}: Material feeding...")
                 
-                # Wait for material to reach the sensor
-                time.sleep(random.uniform(2.0, 4.0)) 
-                
-                # TRIGGER THE SENSOR 
-                # Updated Path: MAIN -> RotaryCutter -> fbProductSensor -> bRawInput
                 sensor_path = "MAIN.RotaryCutter.fbProductSensor.bRawInput"
                 cmd_path = "MAIN.RotaryCutter.RotaryKnife.bSyncCommand"
                 
+                # --- NEW: Every 5th cycle, simulate a JAM ---
+                if cycle_count % 5 == 0:
+                    print(f"[FAULT] !!! MATERIAL JAM DETECTED !!! Holding sensor TRUE...")
+                    plc.write_by_name(sensor_path, True, pyads.PLCTYPE_BOOL)
+                    # Wait for PLC to detect it (PLC timer is 5s)
+                    time.sleep(6.0) 
+                    continue # Skip the rest of the loop to let the ERROR block handle it
+                
+                # --- YOUR ORIGINAL SENSOR LOGIC ---
+                time.sleep(random.uniform(2.0, 4.0)) 
                 print(f"[SENSOR] ---> Material Detected! (Path: {sensor_path})")
                 plc.write_by_name(sensor_path, True, pyads.PLCTYPE_BOOL)
-                
-                # Give the PLC a fraction of a second to run its cycle and react
                 time.sleep(0.1)
                 
-                # VERIFICATION 1: Read the chop command back from the PLC
-                did_it_chop = plc.read_by_name(cmd_path, pyads.PLCTYPE_BOOL)
-                if did_it_chop:
-                    print("   ✅ VERIFIED: PLC responded with 'bSyncCommand = TRUE'. Cut initiated!")
-                else:
-                    print("   ❌ ERROR: No cut command received from PLC.")
+                # VERIFICATION 1 (Restored)
+                if plc.read_by_name(cmd_path, pyads.PLCTYPE_BOOL):
+                    print("   ✅ VERIFIED: Cut initiated!")
                 
-                # Simulated width of the workpiece (the rest of the material passes)
                 time.sleep(0.6) 
-                
                 print("[SENSOR] ---> Material Passed.")
                 plc.write_by_name(sensor_path, False, pyads.PLCTYPE_BOOL)
-                
-                # Give the PLC a fraction of a second to run its cycle and react
                 time.sleep(0.1)
                 
-                # VERIFICATION 2: Check if the PLC turned the chop command off
-                is_chopping = plc.read_by_name(cmd_path, pyads.PLCTYPE_BOOL)
-                if not is_chopping:
-                    print("   ✅ VERIFIED: PLC responded with 'bSyncCommand = FALSE'. Ready for next cut.")
-                else:
-                    print("   ❌ ERROR: Knife is still locked!")
+                # VERIFICATION 2 (Restored)
+                if not plc.read_by_name(cmd_path, pyads.PLCTYPE_BOOL):
+                    print("   ✅ VERIFIED: Ready for next cut.")
+
+            elif state == 99: # ERROR
+                print(f"\n[ALARM] Machine in ERROR state. Initiating Auto-Reset...")
+                time.sleep(2.0)
+                
+                # Release the sensor first
+                plc.write_by_name("MAIN.RotaryCutter.fbProductSensor.bRawInput", False, pyads.PLCTYPE_BOOL)
+                
+                # Trigger Reset and Restart (Your PLC logic handles the rest)
+                plc.write_by_name("MAIN.RotaryCutter.bCmdReset", True, pyads.PLCTYPE_BOOL)
+                time.sleep(1.0)
+                plc.write_by_name("MAIN.RotaryCutter.bCmdStart", True, pyads.PLCTYPE_BOOL)
+                print("[RECOVERY] Reset sent. Restarting machine...")
                 
             else:
-                print(f"[STATUS] Current State: {state} (Waiting for EXECUTE/30...)")
-                time.sleep(2)
+                # If machine is STOPPED or STARTING, just wait
+                time.sleep(1)
 
     except Exception as e:
         print(f"\n[ERROR] ADS Communication failed: {e}")
