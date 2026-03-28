@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_Safety" Id="{597b61b6-4e0d-4df1-a136-de6922e9752c}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+    // This represents the signal from the Yellow TwinSAFE hardware
+    bSafetyOk AT %I* : BOOL; 
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -10,7 +10,8 @@ TYPE E_MachineState :
     STARTING  := 20,
     EXECUTE   := 30,
     STOPPING  := 40,
-    ERROR     := 99
+    ERROR     := 99,
+	EMERGENCY_STOP := 100
 );
 END_TYPE]]></Declaration>
   </DUT>

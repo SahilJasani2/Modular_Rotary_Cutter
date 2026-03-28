@@ -28,24 +28,39 @@ VAR
     // --- Industrial Diagnostics (Alarms) ---
     fbEventLogger      : FB_TcEventLogger;
     fbAlarm            : FB_TcAlarm;
-    bAlarmsInitialized : BOOL; // NEW: Flag to run setup code only once
+    bAlarmsInitialized : BOOL; // Flag to run setup code only once
     tonSensorJam       : TON;  // Detects if material is stuck under the sensor
+    
+    // --- Safety Interface ---
+    bSafetyOk          : BOOL; // Locally mapped safety signal from TwinSAFE
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// =========================================================
-// 0. HARDWARE LINKING
+// 0. SAFETY INTERLOCK (Highest Priority)
+// =========================================================
+// Link the global safety signal to our local variable
+bSafetyOk := GVL_Safety.bSafetyOk;
+
+// Force EMERGENCY_STOP state immediately if safety is lost
+IF NOT bSafetyOk THEN
+    eState := E_MachineState.EMERGENCY_STOP;
+END_IF
+
+// =========================================================
+// 1. HARDWARE LINKING
 // =========================================================
 InfeedConveyor.iProductCam := fbProductSensor;
 InfeedConveyor.iMotor := ConveyorMotor;
 RotaryKnife.iMotor    := KnifeMotor;
 
 // =========================================================
-// 1. THE MAIN STATE MACHINE
+// 2. THE MAIN STATE MACHINE
 // =========================================================
 CASE eState OF
 
     E_MachineState.STOPPED:
-        IF bCmdStart THEN
+        // Only allow start if Safety is OK
+        IF bCmdStart AND bSafetyOk THEN
             bCmdStart := FALSE;
             eState := E_MachineState.STARTING;
         END_IF
@@ -76,36 +91,44 @@ CASE eState OF
         eState := E_MachineState.STOPPED;
 
     E_MachineState.ERROR:
-        IF bCmdReset THEN
+        // Only allow Reset if Safety is OK
+        IF bCmdReset AND bSafetyOk THEN
             bCmdReset := FALSE;
-            // Clear the alarm when the operator hits reset
             fbAlarm.Clear(0, TRUE);
+            eState := E_MachineState.STOPPED;
+        END_IF
+
+    E_MachineState.EMERGENCY_STOP:
+        // KILL ACTUATORS
+        RotaryKnife.bEnable := FALSE;
+        RotaryKnife.bSyncCommand := FALSE;
+        // ConveyorMotor.bEnable is not required/supported by FB_Drive
+        
+        // Recovery: Exit only if Safety is restored AND operator presses Reset
+        IF bSafetyOk AND bCmdReset THEN
+            bCmdReset := FALSE;
             eState := E_MachineState.STOPPED;
         END_IF
 
 END_CASE
 
 // =========================================================
-// 2. INDUSTRIAL DIAGNOSTICS (ALARM LOGIC)
+// 3. INDUSTRIAL DIAGNOSTICS (ALARM LOGIC)
 // =========================================================
-// A. Initialize the alarm object once
 IF NOT bAlarmsInitialized THEN
     fbAlarm.CreateEx(TC_Events.MachineAlarms.ConveyorSensorJam, TRUE, 0);
     bAlarmsInitialized := TRUE;
 END_IF
 
-// B. Monitor for a Sensor Jam 
-// (If sensor is active for > 5 seconds while machine is running)
 tonSensorJam(IN := (fbProductSensor.bRawInput AND eState = E_MachineState.EXECUTE), PT := T#5S);
 
-// C. Trigger Alarm and Machine Stop
 IF tonSensorJam.Q THEN
     fbAlarm.Raise(0);
     eState := E_MachineState.ERROR;
 END_IF
 
 // =========================================================
-// 3. ALWAYS CALL THE MODULES AND MOTORS
+// 4. ALWAYS CALL THE MODULES AND MOTORS
 // =========================================================
 fbProductSensor();
 ConveyorMotor();
@@ -114,7 +137,7 @@ InfeedConveyor();
 RotaryKnife();
 
 // =========================================================
-// 4. TELEMETRY & CLOUD SYNC
+// 5. TELEMETRY & CLOUD SYNC
 // =========================================================
 EdgeGateway(eCurrentState := eState);]]></ST>
     </Implementation>

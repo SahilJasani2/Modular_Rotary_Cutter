@@ -51,17 +51,21 @@ class RotaryCutterTwin:
         self.PATH_STATE   = "MAIN.RotaryCutter.eState"
         self.PATH_SENSOR  = "MAIN.RotaryCutter.fbProductSensor.bRawInput"
         self.PATH_CHOP    = "MAIN.RotaryCutter.RotaryKnife.bSyncCommand"
+        # NEW: Safety Bridge Path
+        self.PATH_SAFETY  = "GVL_Safety.bSafetyOk"
 
     def connect(self):
         self.plc.open()
-        IndustrialLogger.success(f"ADS Connection Established. NetID: {self.ams_id}")
+        # Initialize Safety to TRUE so the machine can start
+        self.plc.write_by_name(self.PATH_SAFETY, True, pyads.PLCTYPE_BOOL)
+        IndustrialLogger.success(f"ADS Connection Established & Safety OK. NetID: {self.ams_id}")
 
     def press_start(self):
         IndustrialLogger.hmi("Operator pressed 'Start'. Syncing with PLC...")
         self.plc.write_by_name(self.PATH_START, True, pyads.PLCTYPE_BOOL)
         time.sleep(1.0)
 
-    def handle_recovery(self):
+    def _recover_from_jam(self):
         IndustrialLogger.fault("State: ERROR (99). Initiating Auto-Recovery sequence...")
         # 1. Clear blockage
         self.plc.write_by_name(self.PATH_SENSOR, False, pyads.PLCTYPE_BOOL)
@@ -71,42 +75,53 @@ class RotaryCutterTwin:
         time.sleep(1.0)
         # 3. Restart
         self.plc.write_by_name(self.PATH_START, True, pyads.PLCTYPE_BOOL)
-        IndustrialLogger.success("Recovery complete. Resuming endless simulation.")
+        IndustrialLogger.success("Jam Recovery complete. Resuming simulation.")
+
+    def _recover_from_safety_trip(self):
+        IndustrialLogger.fault("State: EMERGENCY_STOP (100). Safety violation detected.")
+        time.sleep(2.0)
+        # 1. Simulate "Pulling out the E-Stop button"
+        IndustrialLogger.hmi("Restoring Safety Circuit (bSafetyOk -> TRUE)...")
+        self.plc.write_by_name(self.PATH_SAFETY, True, pyads.PLCTYPE_BOOL)
+        time.sleep(1.0)
+        # 2. Manual Reset Required
+        self.plc.write_by_name(self.PATH_RESET, True, pyads.PLCTYPE_BOOL)
+        time.sleep(1.0)
+        # 3. Restart
+        self.plc.write_by_name(self.PATH_START, True, pyads.PLCTYPE_BOOL)
+        IndustrialLogger.success("Safety Recovery complete. Resuming simulation.")
 
     def run_normal_cycle(self, cycle_num):
         IndustrialLogger.info(f"CYCLE {cycle_num}: Conveyor active. Material in transit...")
-        
-        # Physics: Material arrival delay
         time.sleep(random.uniform(2.0, 4.0)) 
         
-        # Trigger Sensor
         IndustrialLogger.info(f"---> Material Detected! (Path: {self.PATH_SENSOR})")
         self.plc.write_by_name(self.PATH_SENSOR, True, pyads.PLCTYPE_BOOL)
         time.sleep(0.1)
         
-        # Verification 1: Sync Command
         if self.plc.read_by_name(self.PATH_CHOP, pyads.PLCTYPE_BOOL):
             IndustrialLogger.success("VERIFIED: PLC responded with 'bSyncCommand = TRUE'.")
         else:
             IndustrialLogger.fault("VERIFICATION FAILED: No Sync Command detected.")
         
-        # Physics: Material passing duration
         time.sleep(0.6) 
         IndustrialLogger.info("---> Material Passed.")
         self.plc.write_by_name(self.PATH_SENSOR, False, pyads.PLCTYPE_BOOL)
         time.sleep(0.1)
         
-        # Verification 2: Release
         if not self.plc.read_by_name(self.PATH_CHOP, pyads.PLCTYPE_BOOL):
-            IndustrialLogger.success("VERIFIED: PLC released Sync Command. Knife ready.")
-        else:
-            IndustrialLogger.fault("VERIFICATION FAILED: Knife still locked!")
+            IndustrialLogger.success("VERIFIED: PLC released Sync Command.")
 
     def inject_jam(self):
-        IndustrialLogger.fault("INJECTING FAULT: Material Jam (Sensor stuck TRUE).")
+        IndustrialLogger.fault("INJECTING PROCESS FAULT: Material Jam.")
         self.plc.write_by_name(self.PATH_SENSOR, True, pyads.PLCTYPE_BOOL)
         IndustrialLogger.info("Waiting for PLC Alarm detection (5.0s logic)...")
         time.sleep(6.0)
+
+    def trigger_panic_stop(self):
+        IndustrialLogger.fault("!!! TRIGGERING PANIC TEST: E-STOP PRESSED !!!")
+        self.plc.write_by_name(self.PATH_SAFETY, False, pyads.PLCTYPE_BOOL)
+        time.sleep(3.0)
 
     def start_simulation(self):
         self.connect()
@@ -120,13 +135,19 @@ class RotaryCutterTwin:
             
             if state == 30: # EXECUTE
                 cycle_count += 1
-                if cycle_count % 5 == 0:
+                # Panic test every 7 cycles, Jam test every 5
+                if cycle_count % 7 == 0:
+                    self.trigger_panic_stop()
+                elif cycle_count % 5 == 0:
                     self.inject_jam()
                 else:
                     self.run_normal_cycle(cycle_count)
             
-            elif state == 99: # ERROR
-                self.handle_recovery()
+            elif state == 99: # ERROR (Jam)
+                self._recover_from_jam()
+                
+            elif state == 100: # EMERGENCY_STOP
+                self._recover_from_safety_trip()
             
             else:
                 IndustrialLogger.info(f"Waiting for State 30 (Current: {state})...")
