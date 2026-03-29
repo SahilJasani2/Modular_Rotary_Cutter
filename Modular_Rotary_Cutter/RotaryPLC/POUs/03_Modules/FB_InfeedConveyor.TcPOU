@@ -3,15 +3,16 @@
   <POU Name="FB_InfeedConveyor" Id="{bd972d02-828a-4a6c-9ef5-f96cad8432c6}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_InfeedConveyor
 VAR_INPUT
-    // Moving these to VAR_INPUT makes them "plugs" we can use from outside
-    iMotor      : I_Drive; 
-    iProductCam : I_DigitalSensor;
-    fTargetVelocity : LREAL := 100.0;  // Moved here so the Main Machine can configure it
-	
+    iMotor          : I_Drive;
+    iProductCam     : I_DigitalSensor;
+    
+    // --- NEW: Commands from Main Machine ---
+    bEnable         : BOOL; // <--- ADD THIS LINE
+    
+    // --- Machine Parameters ---
+    fTargetVelocity : LREAL := 100.0;
 END_VAR
-
 VAR
-
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// The conveyor is very simple for now. 

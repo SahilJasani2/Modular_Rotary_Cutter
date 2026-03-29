@@ -36,40 +36,53 @@ VAR
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// =========================================================
-// 0. SAFETY INTERLOCK (Highest Priority)
+// 0. SAFETY MONITORING
 // =========================================================
-// Link the global safety signal to our local variable
 bSafetyOk := GVL_Safety.bSafetyOk;
 
-// Force EMERGENCY_STOP state immediately if safety is lost
-IF NOT bSafetyOk THEN
-    eState := E_MachineState.EMERGENCY_STOP;
+// If safety drops, force the state machine into the ABORT sequence immediately.
+IF NOT bSafetyOk AND eState <> E_MachineState.ABORTING AND eState <> E_MachineState.ABORTED THEN
+    eState := E_MachineState.ABORTING;
 END_IF
 
 // =========================================================
 // 1. HARDWARE LINKING
 // =========================================================
 InfeedConveyor.iProductCam := fbProductSensor;
-InfeedConveyor.iMotor := ConveyorMotor;
-RotaryKnife.iMotor    := KnifeMotor;
+InfeedConveyor.iMotor      := ConveyorMotor;
+RotaryKnife.iMotor         := KnifeMotor;
 
 // =========================================================
-// 2. THE MAIN STATE MACHINE
+// 2. THE PACKML STATE MACHINE
 // =========================================================
 CASE eState OF
 
+    E_MachineState.UNDEFINED:
+        eState := E_MachineState.STOPPED;
+
+    // ---------------------------------------------------------
+    // NORMAL OPERATIONS
+    // ---------------------------------------------------------
     E_MachineState.STOPPED:
-        // Only allow start if Safety is OK
         IF bCmdStart AND bSafetyOk THEN
             bCmdStart := FALSE;
             eState := E_MachineState.STARTING;
         END_IF
 
     E_MachineState.STARTING:
-        eState := E_MachineState.EXECUTE;
+        // Trigger the homing routine we built in Phase 1
+        RotaryKnife.bHomeCommand := TRUE;
+        
+        // Wait for the knife to finish homing before moving to EXECUTE
+        // (Assuming the motor drops P_Busy when homing is complete)
+        IF NOT RotaryKnife.iMotor.P_Busy THEN 
+            RotaryKnife.bHomeCommand := FALSE;
+            eState := E_MachineState.EXECUTE;
+        END_IF
 
     E_MachineState.EXECUTE:
         RotaryKnife.bEnable := TRUE;
+        // InfeedConveyor.bEnable := TRUE; // We will add this to the conveyor block next!
 
         // Ninja Chop Logic
         IF fbProductSensor.P_RisingEdge THEN
@@ -82,31 +95,52 @@ CASE eState OF
 
         IF bCmdStop THEN
             bCmdStop := FALSE;
-            RotaryKnife.bEnable := FALSE;
-            RotaryKnife.bSyncCommand := FALSE;
-            eState := E_MachineState.STOPPING;
+            eState := E_MachineState.HOLDING;
         END_IF
 
-    E_MachineState.STOPPING:
-        eState := E_MachineState.STOPPED;
-
-    E_MachineState.ERROR:
-        // Only allow Reset if Safety is OK
-        IF bCmdReset AND bSafetyOk THEN
-            bCmdReset := FALSE;
-            fbAlarm.Clear(0, TRUE);
-            eState := E_MachineState.STOPPED;
-        END_IF
-
-    E_MachineState.EMERGENCY_STOP:
-        // KILL ACTUATORS
-        RotaryKnife.bEnable := FALSE;
+    // ---------------------------------------------------------
+    // PAUSING (Non-critical stops)
+    // ---------------------------------------------------------
+    E_MachineState.HOLDING:
         RotaryKnife.bSyncCommand := FALSE;
-        // ConveyorMotor.bEnable is not required/supported by FB_Drive
-        
-        // Recovery: Exit only if Safety is restored AND operator presses Reset
+        eState := E_MachineState.HELD;
+
+    E_MachineState.HELD:
+        IF bCmdStart AND bSafetyOk THEN
+            bCmdStart := FALSE;
+            eState := E_MachineState.UNHOLDING;
+        END_IF
+
+    E_MachineState.UNHOLDING:
+        eState := E_MachineState.EXECUTE;
+
+    // ---------------------------------------------------------
+    // FAULTS & SAFETY 
+    // ---------------------------------------------------------
+    E_MachineState.ABORTING:
+        // Drop logical commands
+        RotaryKnife.bSyncCommand := FALSE;
+        eState := E_MachineState.ABORTED;
+
+    E_MachineState.ABORTED:
+        // Wait for physical safety to return AND operator to press Reset
         IF bSafetyOk AND bCmdReset THEN
             bCmdReset := FALSE;
+            eState := E_MachineState.CLEARING;
+        END_IF
+
+    E_MachineState.CLEARING:
+        // Require explicit Acknowledge (Confirm) before clearing
+        fbAlarm.Confirm(0);
+        fbAlarm.Clear(0, TRUE);
+        eState := E_MachineState.STOPPED;
+
+    // ---------------------------------------------------------
+    // AUXILIARY MODES
+    // ---------------------------------------------------------
+    E_MachineState.CLEANING:
+        IF bCmdStop THEN
+            bCmdStop := FALSE;
             eState := E_MachineState.STOPPED;
         END_IF
 
@@ -124,11 +158,22 @@ tonSensorJam(IN := (fbProductSensor.bRawInput AND eState = E_MachineState.EXECUT
 
 IF tonSensorJam.Q THEN
     fbAlarm.Raise(0);
-    eState := E_MachineState.ERROR;
+    eState := E_MachineState.ABORTING; // Send machine to fault state
 END_IF
 
 // =========================================================
-// 4. ALWAYS CALL THE MODULES AND MOTORS
+// 4. HARDWARE SAFETY MASK (Absolute Override - STEP 12)
+// =========================================================
+// No matter what the State Machine above is doing, if safety is lost, 
+// or we are in a fault state, physically drop actuator power.
+IF NOT bSafetyOk OR eState = E_MachineState.ABORTING OR eState = E_MachineState.ABORTED THEN
+    RotaryKnife.bEnable := FALSE;
+    RotaryKnife.bSyncCommand := FALSE;
+    // InfeedConveyor.bEnable := FALSE; // Will be uncommented in Step 13
+END_IF
+
+// =========================================================
+// 5. ALWAYS CALL THE MODULES AND MOTORS
 // =========================================================
 fbProductSensor();
 ConveyorMotor();
@@ -137,7 +182,7 @@ InfeedConveyor();
 RotaryKnife();
 
 // =========================================================
-// 5. TELEMETRY & CLOUD SYNC
+// 6. TELEMETRY & CLOUD SYNC
 // =========================================================
 EdgeGateway(eCurrentState := eState);]]></ST>
     </Implementation>

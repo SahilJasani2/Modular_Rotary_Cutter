@@ -5,13 +5,25 @@
 {attribute 'strict'}
 TYPE E_MachineState :
 (
-    UNDEFINED := 0,
-    STOPPED   := 10,
-    STARTING  := 20,
-    EXECUTE   := 30,
-    STOPPING  := 40,
-    ERROR     := 99,
-	EMERGENCY_STOP := 100
+    UNDEFINED   := 0,
+    
+    // --- The 'Stop' States (Normal Operations) ---
+    STOPPED     := 10,
+    STARTING    := 20,
+    EXECUTE     := 30,
+    
+    // --- The 'Pause' States (Minor Jams / Upstream Backup) ---
+    HOLDING     := 40,
+    HELD        := 50,
+    UNHOLDING   := 60,
+    
+    // --- The 'Fault' States (Safety or Major Errors) ---
+    ABORTING    := 70,   // Rapid safe stop
+    ABORTED     := 80,   // Safe state reached
+    CLEARING    := 90,   // Operator acknowledging faults
+    
+    // --- Custom / Auxiliary Modes ---
+    CLEANING    := 100   // Washdown mode (Actuators disabled, but machine 'On')
 );
 END_TYPE]]></Declaration>
   </DUT>
