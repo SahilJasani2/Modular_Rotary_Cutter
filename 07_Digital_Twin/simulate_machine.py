@@ -32,6 +32,10 @@ class IndustrialLogger:
         print(f"{cls._get_timestamp()} | {cls.FAIL}FAULT{cls.ENDC:<8} | {msg}")
 
     @classmethod
+    def warning(cls, msg):
+        print(f"{cls._get_timestamp()} | {cls.WARNING}WARNING{cls.ENDC:<8} | {msg}")
+
+    @classmethod
     def hmi(cls, msg):
         print(f"{cls._get_timestamp()} | {cls.HEADER}HMI{cls.ENDC:<8} | {msg}")
 
@@ -51,7 +55,7 @@ class RotaryCutterTwin:
         self.PATH_STATE   = "MAIN.RotaryCutter.eState"
         self.PATH_SENSOR  = "MAIN.RotaryCutter.fbProductSensor.bRawInput"
         self.PATH_CHOP    = "MAIN.RotaryCutter.RotaryKnife.bSyncCommand"
-        # NEW: Safety Bridge Path
+        # Safety Bridge Path
         self.PATH_SAFETY  = "GVL_Safety.bSafetyOk"
 
     def connect(self):
@@ -66,30 +70,123 @@ class RotaryCutterTwin:
         time.sleep(1.0)
 
     def _recover_from_jam(self):
-        IndustrialLogger.fault("State: ERROR (99). Initiating Auto-Recovery sequence...")
-        # 1. Clear blockage
-        self.plc.write_by_name(self.PATH_SENSOR, False, pyads.PLCTYPE_BOOL)
-        time.sleep(1.0)
-        # 2. Reset
-        self.plc.write_by_name(self.PATH_RESET, True, pyads.PLCTYPE_BOOL)
-        time.sleep(1.0)
-        # 3. Restart
-        self.plc.write_by_name(self.PATH_START, True, pyads.PLCTYPE_BOOL)
-        IndustrialLogger.success("Jam Recovery complete. Resuming simulation.")
+        """Robust recovery from sensor/material jam with state verification"""
+        IndustrialLogger.fault("State: ABORTED (80) - Sensor Jam. Initiating Auto-Recovery sequence...")
+        
+        try:
+            # 1. Clear blockage with verification
+            IndustrialLogger.hmi("Step 1: Clearing material blockage...")
+            self.plc.write_by_name(self.PATH_SENSOR, False, pyads.PLCTYPE_BOOL)
+            time.sleep(1.0)
+            
+            # Verify sensor is cleared
+            sensor_state = self.plc.read_by_name(self.PATH_SENSOR, pyads.PLCTYPE_BOOL)
+            if sensor_state:
+                IndustrialLogger.warning("Sensor still shows blockage - retrying...")
+                self.plc.write_by_name(self.PATH_SENSOR, False, pyads.PLCTYPE_BOOL)
+                time.sleep(0.5)
+            
+            # 2. Reset system with state verification
+            IndustrialLogger.hmi("Step 2: Resetting machine (CLEARING -> STOPPED)...")
+            self.plc.write_by_name(self.PATH_RESET, True, pyads.PLCTYPE_BOOL)
+            
+            # Wait for state transition
+            reset_wait = 0
+            while reset_wait < 10:  # Max 5 seconds wait
+                current_state = self.plc.read_by_name(self.PATH_STATE, pyads.PLCTYPE_INT)
+                if current_state == 90:  # CLEARING state
+                    break
+                reset_wait += 1
+                time.sleep(0.5)
+            
+            # Wait for STOPPED state
+            stopped_wait = 0
+            while stopped_wait < 8:  # Max 4 seconds wait
+                current_state = self.plc.read_by_name(self.PATH_STATE, pyads.PLCTYPE_INT)
+                if current_state in [10, 20]:  # STOPPED or STARTING
+                    break
+                stopped_wait += 1
+                time.sleep(0.5)
+            
+            # 3. Restart with verification
+            IndustrialLogger.hmi("Step 3: Restarting machine (STARTING -> EXECUTE)...")
+            self.plc.write_by_name(self.PATH_START, True, pyads.PLCTYPE_BOOL)
+            
+            # Verify execution state
+            exec_wait = 0
+            while exec_wait < 6:  # Max 3 seconds wait
+                current_state = self.plc.read_by_name(self.PATH_STATE, pyads.PLCTYPE_INT)
+                if current_state == 30:  # EXECUTE
+                    break
+                exec_wait += 1
+                time.sleep(0.5)
+            
+            IndustrialLogger.success("Jam Recovery complete. Resuming simulation.")
+            
+        except Exception as e:
+            IndustrialLogger.fault(f"Jam Recovery FAILED: {e}")
+            raise
 
     def _recover_from_safety_trip(self):
-        IndustrialLogger.fault("State: EMERGENCY_STOP (100). Safety violation detected.")
-        time.sleep(2.0)
-        # 1. Simulate "Pulling out the E-Stop button"
-        IndustrialLogger.hmi("Restoring Safety Circuit (bSafetyOk -> TRUE)...")
-        self.plc.write_by_name(self.PATH_SAFETY, True, pyads.PLCTYPE_BOOL)
-        time.sleep(1.0)
-        # 2. Manual Reset Required
-        self.plc.write_by_name(self.PATH_RESET, True, pyads.PLCTYPE_BOOL)
-        time.sleep(1.0)
-        # 3. Restart
-        self.plc.write_by_name(self.PATH_START, True, pyads.PLCTYPE_BOOL)
-        IndustrialLogger.success("Safety Recovery complete. Resuming simulation.")
+        """Robust recovery from safety/E-stop with proper sequence verification"""
+        IndustrialLogger.fault("State: ABORTING/ABORTED (70/80) - Safety violation detected.")
+        
+        try:
+            # Wait for system to stabilize
+            time.sleep(2.0)
+            
+            # 1. Restore safety circuit with verification
+            IndustrialLogger.hmi("Step 1: Restoring Safety Circuit (bSafetyOk -> TRUE)...")
+            self.plc.write_by_name(self.PATH_SAFETY, True, pyads.PLCTYPE_BOOL)
+            time.sleep(1.0)
+            
+            # Verify safety is restored
+            safety_state = self.plc.read_by_name(self.PATH_SAFETY, pyads.PLCTYPE_BOOL)
+            if not safety_state:
+                IndustrialLogger.warning("Safety circuit not restored - retrying...")
+                self.plc.write_by_name(self.PATH_SAFETY, True, pyads.PLCTYPE_BOOL)
+                time.sleep(0.5)
+            
+            # 2. Manual reset with state verification
+            IndustrialLogger.hmi("Step 2: Manual Reset Required (CLEARING -> STOPPED)...")
+            self.plc.write_by_name(self.PATH_RESET, True, pyads.PLCTYPE_BOOL)
+            
+            # Wait for state transition
+            reset_wait = 0
+            while reset_wait < 10:  # Max 5 seconds wait
+                current_state = self.plc.read_by_name(self.PATH_STATE, pyads.PLCTYPE_INT)
+                if current_state == 90:  # CLEARING state
+                    break
+                reset_wait += 1
+                time.sleep(0.5)
+            
+            # Wait for STOPPED state
+            stopped_wait = 0
+            while stopped_wait < 8:  # Max 4 seconds wait
+                current_state = self.plc.read_by_name(self.PATH_STATE, pyads.PLCTYPE_INT)
+                if current_state in [10, 20]:  # STOPPED or STARTING
+                    break
+                stopped_wait += 1
+                time.sleep(0.5)
+            
+            # 3. Restart with verification
+            IndustrialLogger.hmi("Step 3: Restarting machine (STARTING -> EXECUTE)...")
+            self.plc.write_by_name(self.PATH_START, True, pyads.PLCTYPE_BOOL)
+            
+            # Verify execution state
+            exec_wait = 0
+            while exec_wait < 6:  # Max 3 seconds wait
+                current_state = self.plc.read_by_name(self.PATH_STATE, pyads.PLCTYPE_INT)
+                if current_state == 30:  # EXECUTE
+                    break
+                exec_wait += 1
+                time.sleep(0.5)
+            
+            IndustrialLogger.success("Safety Recovery complete. Resuming simulation.")
+            
+        except Exception as e:
+            IndustrialLogger.fault(f"Safety Recovery FAILED: {e}")
+            raise
 
     def run_normal_cycle(self, cycle_num):
         IndustrialLogger.info(f"CYCLE {cycle_num}: Conveyor active. Material in transit...")
@@ -124,34 +221,65 @@ class RotaryCutterTwin:
         time.sleep(3.0)
 
     def start_simulation(self):
+        """Enhanced simulation with true stochastic chaos engineering"""
         self.connect()
         self.press_start()
         
         cycle_count = 0
         IndustrialLogger.info("Simulation Loop Running. Use Ctrl+C to terminate.")
+        IndustrialLogger.info("Chaos Engineering Mode: ACTIVE (Randomized Fault Injection)")
         
         while True:
-            state = self.plc.read_by_name(self.PATH_STATE, pyads.PLCTYPE_INT)
-            
-            if state == 30: # EXECUTE
-                cycle_count += 1
-                # Panic test every 7 cycles, Jam test every 5
-                if cycle_count % 7 == 0:
-                    self.trigger_panic_stop()
-                elif cycle_count % 5 == 0:
-                    self.inject_jam()
-                else:
-                    self.run_normal_cycle(cycle_count)
-            
-            elif state == 99: # ERROR (Jam)
-                self._recover_from_jam()
+            try:
+                state = self.plc.read_by_name(self.PATH_STATE, pyads.PLCTYPE_INT)
                 
-            elif state == 100: # EMERGENCY_STOP
-                self._recover_from_safety_trip()
-            
-            else:
-                IndustrialLogger.info(f"Waiting for State 30 (Current: {state})...")
-                time.sleep(2)
+                if state == 30:  # EXECUTE
+                    cycle_count += 1
+                    
+                    # =========================================================
+                    # CHAOS ENGINEERING: True Stochastic Fault Injection
+                    # =========================================================
+                    chaos_factor = random.random()
+                    
+                    if chaos_factor <= 0.02: 
+                        # 2% chance per cycle of catastrophic E-Stop
+                        IndustrialLogger.warning(f"CHAOS EVENT: Safety Trip (2% probability hit)")
+                        self.trigger_panic_stop()
+                        
+                    elif chaos_factor <= 0.15: 
+                        # 13% chance per cycle of material jam
+                        IndustrialLogger.warning(f"CHAOS EVENT: Material Jam (13% probability hit)")
+                        self.inject_jam()
+                        
+                    else:
+                        # 85% chance of perfectly normal run
+                        self.run_normal_cycle(cycle_count)
+                
+                elif state == 70 or state == 80:  # ABORTING or ABORTED
+                    # Check what caused the abort to run the right recovery
+                    if not self.plc.read_by_name(self.PATH_SAFETY, pyads.PLCTYPE_BOOL):
+                        IndustrialLogger.info("Detected Emergency Stop - Running Recovery...")
+                        self._recover_from_safety_trip()
+                    else:
+                        IndustrialLogger.info("Detected Jam State - Running Recovery...")
+                        self._recover_from_jam()
+                        
+                elif state == 90:  # CLEARING
+                    # Ensure proper state transition
+                    IndustrialLogger.info("Machine in CLEARING state - waiting for STOPPED...")
+                    time.sleep(1.0)
+                    
+                else:
+                    IndustrialLogger.info(f"Waiting for State 30 (Current: {state})...")
+                    time.sleep(2.0)
+                    
+            except pyads.ADSError as ads_err:
+                IndustrialLogger.fault(f"ADS Communication Error: {ads_err}")
+                time.sleep(1.0)  # Brief delay before retry
+                
+            except Exception as e:
+                IndustrialLogger.fault(f"Unexpected Error in Simulation Loop: {e}")
+                time.sleep(1.0)
 
 # ==============================================================================
 # ENTRY POINT
