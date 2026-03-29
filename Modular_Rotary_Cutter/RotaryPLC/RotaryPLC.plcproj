@@ -16,6 +16,7 @@
     <Implicit_KindOfTask>{3daf77e5-7b83-4dca-82ab-41075cce2bbe}</Implicit_KindOfTask>
     <Implicit_Jitter_Distribution>{cdc81cac-00fa-4d0e-abc4-e822c4690fd4}</Implicit_Jitter_Distribution>
     <LibraryReferences>{ee533040-8947-4ce7-b9dc-792ce35051a0}</LibraryReferences>
+    <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\E_MachineState.TcDUT">

@@ -18,7 +18,7 @@ END_VAR]]></Declaration>
       <ST><![CDATA[// The conveyor is very simple for now. 
 // It just ensures the motor is enabled and running.
 IF iMotor <> 0 THEN
-    iMotor.P_Enabled := TRUE;
+    iMotor.P_Enabled := bEnable;
     iMotor.M_MoveVel(fVelocity := fTargetVelocity);
 END_IF]]></ST>
     </Implementation>

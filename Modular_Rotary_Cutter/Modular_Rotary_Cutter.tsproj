@@ -2,20 +2,31 @@
 <TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.20">
 	<DataTypes>
 		<DataType>
-			<Name GUID="{F61ABB64-F121-4704-90B4-B4CACE9A319A}" PersistentType="true">MachineAlarms</Name>
+			<Name GUID="{6D66C7FD-646F-4D8B-8203-3E63BBED13A1}" PersistentType="true">MachineAlarms</Name>
 			<DisplayName TxtId=""><![CDATA[Machine Alarms]]></DisplayName>
 			<EventId>
 				<Name Id="1">ConveyorSensorJam</Name>
 				<DisplayName TxtId=""><![CDATA[Conveyor Sensor Blocked for too long!]]></DisplayName>
 				<Severity>Error</Severity>
 			</EventId>
+			<EventId>
+				<Name Id="2">SafetyTrip</Name>
+				<DisplayName TxtId=""><![CDATA["Emergency Stop or Safety Door Opened"]]></DisplayName>
+				<Severity>Critical</Severity>
+			</EventId>
 			<Hides>
 				<Hide GUID="{2379BB02-9527-413B-BE5B-53224F3A68CB}"/>
+				<Hide GUID="{F61ABB64-F121-4704-90B4-B4CACE9A319A}"/>
 			</Hides>
 		</DataType>
 	</DataTypes>
 	<Project ProjectGUID="{1CD0E429-F044-4E22-88B7-CF7EE53EF161}" TargetNetId="199.4.42.250.1.1" Target64Bit="true" ShowHideConfigurations="#x6">
 		<System>
+			<Licenses>
+				<Target>
+					<ManualSelect>{BDCC0070-42D5-49AE-ABF1-1D4434813D60}</ManualSelect>
+				</Target>
+			</Licenses>
 			<Tasks>
 				<Task Id="3" Priority="20" CycleTime="100000" AmsPort="350" AdtTasks="true">
 					<Name>PlcTask</Name>

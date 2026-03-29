@@ -13,26 +13,36 @@ VAR
 
     // --- Concrete Hardware Instances for Simulation ---
     fbProductSensor : FB_DigitalSensor;
-
+    
     // --- Edge/IoT Telemetry ---
     EdgeGateway     : FB_Telemetry;
-
+    
     // --- State Machine Tracking ---
+	{attribute 'OPC.UA.DA' := '1'}
     eState          : E_MachineState := E_MachineState.STOPPED;
-
+	
+	{attribute 'OPC.UA.DA' := '1'}
+    udiCutsCompleted : UDINT;
+    
     // --- Operator Commands ---
+	{attribute 'OPC.UA.DA' := '1'}
     bCmdStart       : BOOL;
+	
+	{attribute 'OPC.UA.DA' := '1'}
     bCmdStop        : BOOL;
+	
+	{attribute 'OPC.UA.DA' := '1'}
     bCmdReset       : BOOL;
-
+    
     // --- Industrial Diagnostics (Alarms) ---
     fbEventLogger      : FB_TcEventLogger;
-    fbAlarm            : FB_TcAlarm;
-    bAlarmsInitialized : BOOL; // Flag to run setup code only once
-    tonSensorJam       : TON;  // Detects if material is stuck under the sensor
+    fbAlarmJam         : FB_TcAlarm;      // Alarm for material jams
+    fbAlarmSafety      : FB_TcAlarm;      // Alarm for E-Stop / Safety Trips
+    bAlarmsInitialized : BOOL;            // Flag to run setup code only once
+    tonSensorJam       : TON;             // Detects if material is stuck
     
     // --- Safety Interface ---
-    bSafetyOk          : BOOL; // Locally mapped safety signal from TwinSAFE
+    bSafetyOk          : BOOL;            // Locally mapped safety signal
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// =========================================================
@@ -74,7 +84,6 @@ CASE eState OF
         RotaryKnife.bHomeCommand := TRUE;
         
         // Wait for the knife to finish homing before moving to EXECUTE
-        // (Assuming the motor drops P_Busy when homing is complete)
         IF NOT RotaryKnife.iMotor.P_Busy THEN 
             RotaryKnife.bHomeCommand := FALSE;
             eState := E_MachineState.EXECUTE;
@@ -82,7 +91,7 @@ CASE eState OF
 
     E_MachineState.EXECUTE:
         RotaryKnife.bEnable := TRUE;
-        // InfeedConveyor.bEnable := TRUE; // We will add this to the conveyor block next!
+        InfeedConveyor.bEnable := TRUE; // Conveyor brakes released!
 
         // Ninja Chop Logic
         IF fbProductSensor.P_RisingEdge THEN
@@ -91,6 +100,7 @@ CASE eState OF
         
         IF fbProductSensor.P_FallingEdge THEN
             RotaryKnife.bSyncCommand := FALSE;
+			udiCutsCompleted := udiCutsCompleted + 1;
         END_IF
 
         IF bCmdStop THEN
@@ -131,8 +141,12 @@ CASE eState OF
 
     E_MachineState.CLEARING:
         // Require explicit Acknowledge (Confirm) before clearing
-        fbAlarm.Confirm(0);
-        fbAlarm.Clear(0, TRUE);
+        fbAlarmJam.Confirm(0);
+        fbAlarmJam.Clear(0, TRUE);
+        
+        fbAlarmSafety.Confirm(0);
+        fbAlarmSafety.Clear(0, TRUE);
+        
         eState := E_MachineState.STOPPED;
 
     // ---------------------------------------------------------
@@ -150,26 +164,33 @@ END_CASE
 // 3. INDUSTRIAL DIAGNOSTICS (ALARM LOGIC)
 // =========================================================
 IF NOT bAlarmsInitialized THEN
-    fbAlarm.CreateEx(TC_Events.MachineAlarms.ConveyorSensorJam, TRUE, 0);
+    fbAlarmJam.CreateEx(TC_Events.MachineAlarms.ConveyorSensorJam, TRUE, 0);
+    fbAlarmSafety.CreateEx(TC_Events.MachineAlarms.SafetyTrip, TRUE, 0); 
     bAlarmsInitialized := TRUE;
 END_IF
 
+// --- Jam Detection ---
 tonSensorJam(IN := (fbProductSensor.bRawInput AND eState = E_MachineState.EXECUTE), PT := T#5S);
 
 IF tonSensorJam.Q THEN
-    fbAlarm.Raise(0);
-    eState := E_MachineState.ABORTING; // Send machine to fault state
+    fbAlarmJam.Raise(0);
+    eState := E_MachineState.ABORTING; 
+END_IF
+
+// --- Safety Detection ---
+IF NOT bSafetyOk AND NOT fbAlarmSafety.bRaised THEN
+    fbAlarmSafety.Raise(0);
 END_IF
 
 // =========================================================
-// 4. HARDWARE SAFETY MASK (Absolute Override - STEP 12)
+// 4. HARDWARE SAFETY MASK (Absolute Override)
 // =========================================================
 // No matter what the State Machine above is doing, if safety is lost, 
 // or we are in a fault state, physically drop actuator power.
 IF NOT bSafetyOk OR eState = E_MachineState.ABORTING OR eState = E_MachineState.ABORTED THEN
     RotaryKnife.bEnable := FALSE;
     RotaryKnife.bSyncCommand := FALSE;
-    // InfeedConveyor.bEnable := FALSE; // Will be uncommented in Step 13
+    InfeedConveyor.bEnable := FALSE; 
 END_IF
 
 // =========================================================
