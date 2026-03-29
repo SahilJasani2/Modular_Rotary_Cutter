@@ -4,11 +4,15 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RotaryKnife
 VAR_INPUT
     // --- Hardware Link ---
-    iMotor          : I_Drive; // The motor that spins the blade
+    iMotor          : I_Drive;
     
-    // --- NEW: Commands from Main Machine ---
-    bEnable         : BOOL; // Torque on/off
-    bSyncCommand    : BOOL; // Request to 'Lock' to the conveyor
+    // --- Commands from Main Machine ---
+    bEnable         : BOOL;
+    bSyncCommand    : BOOL;
+    bHomeCommand    : BOOL;  // <--- NEW: Request to find Zero position
+
+    // --- NEW: Machine Parameters ---
+    fKnifeDiameter  : LREAL := 100.0; // Moved from VAR to VAR_INPUT
 END_VAR
 VAR
     // --- Master Reference ---
@@ -17,14 +21,14 @@ VAR
     // --- Motion Control Blocks ---
     fbGearIn        : MC_GearIn;
     fbGearOut       : MC_GearOut;
+    rtHome          : R_TRIG; // <--- NEW: Rising edge trigger for homing
     
     // --- Configuration ---
-    fKnifeDiameter  : LREAL := 100.0;
     fGearRatio      : LREAL := 1.0;
     
     // --- Status ---
-    bIsSynchronized : BOOL; // Feedback that we are locked
-    bError          : BOOL; // Fault status
+    bIsSynchronized : BOOL;
+    bError          : BOOL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// 1. Safety Check: Only run if a motor has been assigned
@@ -34,30 +38,37 @@ IF iMotor <> 0 THEN
     iMotor.P_Enabled := bEnable;
     bError := iMotor.P_Error;
 
-    // 3. Electronic Gearing (Synchronization)
-    // __ISVALIDREF checks if we have actually pointed this at a Master axis
+    // =========================================================
+    // 3. NEW: HOMING SEQUENCE
+    // =========================================================
+    rtHome(CLK := bHomeCommand);
+    IF rtHome.Q THEN
+        iMotor.M_Home(); // Trigger the hardware wrapper homing method!
+    END_IF
+
+    // =========================================================
+    // 4. ELECTRONIC GEARING (Synchronization)
+    // =========================================================
     IF __ISVALIDREF(pMasterAxis) THEN
         
         // Command to Lock the Knife to the Conveyor
         fbGearIn(
-            Master          := pMasterAxis,
-            Slave           := iMotor.P_Axis, // Using the new property we just made
-            Execute         := bSyncCommand,
-            RatioNumerator  := 1,
+            Master           := pMasterAxis,
+            Slave            := iMotor.P_Axis, 
+            Execute          := bSyncCommand,
+            RatioNumerator   := 1,
             RatioDenominator := 1,
-            Acceleration    := 1000,
-            Deceleration    := 1000
+            Acceleration     := 1000,
+            Deceleration     := 1000
         );
         
-        // Update Status
         bIsSynchronized := fbGearIn.InGear;
         
         // Command to Unlock (Stop following)
         fbGearOut(
-            Slave           := iMotor.P_Axis,
-            Execute         := NOT bSyncCommand AND bIsSynchronized
+            Slave            := iMotor.P_Axis,
+            Execute          := NOT bSyncCommand AND bIsSynchronized
         );
-        
     END_IF
     
 END_IF]]></ST>
