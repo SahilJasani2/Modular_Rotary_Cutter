@@ -3,6 +3,12 @@
   <Itf Name="I_Drive" Id="{bac1fedb-add2-4ee9-b6e6-a090fe2bb612}">
     <Declaration><![CDATA[INTERFACE I_Drive
 ]]></Declaration>
+    <Method Name="M_Home" Id="{81864300-7c80-4e81-8d44-3b6b80edf1a1}">
+      <Declaration><![CDATA[METHOD M_Home : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
     <Method Name="M_MoveAbs" Id="{dd77af82-b0a4-48da-a076-c4140e59b2e0}">
       <Declaration><![CDATA[METHOD M_MoveAbs : BOOL
 VAR_INPUT

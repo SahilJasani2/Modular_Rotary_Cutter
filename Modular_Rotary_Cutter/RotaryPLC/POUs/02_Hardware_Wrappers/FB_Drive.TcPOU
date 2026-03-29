@@ -13,6 +13,7 @@ VAR
     fbStop      : MC_Stop;
     fbMoveAbs   : MC_MoveAbsolute;
     fbMoveVel   : MC_MoveVelocity;
+	fbHome      : MC_Home;
 
     // --- Internal Status Tracking ---
     bEnableCmd  : BOOL; // Linked to P_Enabled
@@ -35,6 +36,7 @@ fbReset(Axis := Axis);
 fbStop(Axis := Axis);
 fbMoveAbs(Axis := Axis);
 fbMoveVel(Axis := Axis);
+fbHome(Axis := Axis);
 
 // =========================================================
 // STEP 14: TRIGGER RESET LOGIC
@@ -47,8 +49,21 @@ fbMoveVel(Axis := Axis);
 fbReset.Execute   := FALSE;
 fbStop.Execute    := FALSE;
 fbMoveAbs.Execute := FALSE;
-fbMoveVel.Execute := FALSE;]]></ST>
+fbMoveVel.Execute := FALSE;
+fbHome.Execute    := FALSE;]]></ST>
     </Implementation>
+    <Method Name="M_Home" Id="{7790ed11-5148-4807-a00e-287e41768cda}">
+      <Declaration><![CDATA[METHOD M_Home : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Trigger a rising edge on the internal home block
+// Note: We use the default homing mode configured in the TwinCAT NC Axis
+fbHome.bCalibrationCam := FALSE; 
+fbHome.Execute := TRUE;
+
+M_Home := TRUE;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="M_MoveAbs" Id="{91be8eab-f779-49c3-9c91-e8161a59ed82}">
       <Declaration><![CDATA[METHOD M_MoveAbs : BOOL
 VAR_INPUT
@@ -116,7 +131,7 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[// The axis is busy if it is physically moving or if a move block is still active
-P_Busy := Axis.Status.Moving OR fbMoveAbs.Busy OR fbMoveVel.Busy;]]></ST>
+P_Busy := Axis.Status.Moving OR fbMoveAbs.Busy OR fbMoveVel.Busy OR fbHome.Busy;]]></ST>
         </Implementation>
       </Get>
     </Property>
