@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="10.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7f8c09dc-9bb0-445b-8d7f-19ee0645bbb4}</ProjectGuid>
-    <AssemblyName>OpcUA_Server</AssemblyName>
-    <Name>OpcUA_Server</Name>
-    <RootNamespace>OpcUA_Server</RootNamespace>
+    <ProjectGuid>{20e2347f-0246-42ad-a7d0-67798273d816}</ProjectGuid>
+    <AssemblyName>OPC UA Server</AssemblyName>
+    <Name>OPC UA Server</Name>
+    <RootNamespace>OPC UA Server</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="TwinCAT OPC UA Server Project1.tcopcuasrv">
