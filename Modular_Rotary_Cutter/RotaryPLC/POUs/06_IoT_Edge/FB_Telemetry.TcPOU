@@ -5,6 +5,9 @@
 VAR_INPUT
     // The main machine will pass its current state in here
     eCurrentState : E_MachineState; 
+    
+    // NEW: Metric for production tracking
+    udiCutsCompleted : UDINT;
 END_VAR
 VAR
     // The TwinCAT MQTT Client
@@ -18,11 +21,18 @@ VAR
     // Payload generation
     sPayload      : STRING(255);
     fbTimer       : TON; // Timer to publish data every 2 seconds
+    
+    // NEW: String helpers for JSON formatting
+    sStateStr     : STRING;
+    sCutStr       : STRING;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// 1. Configure the Client
 fbMqttClient.sHostName := sBrokerIp;
-fbMqttClient.nHostPort := 1883;
+fbMqttClient.nHostPort := 8883; // UPDATED: Changed from 1883 to 8883 for Secure MQTTS
+
+// (Note for Portfolio: In a real factory, we would link the TLS cert path here)
+// fbMqttClient.stTLS.sCA := 'C:\TwinCAT\Certificates\ca.crt';
 
 // 2. Keep the Client running in the background
 fbMqttClient.Execute(bConnect := bEnableMqtt);
@@ -33,9 +43,15 @@ fbTimer(IN := NOT fbTimer.Q, PT := T#2S);
 // 4. Publish Data
 IF fbMqttClient.bConnected AND fbTimer.Q THEN
     
-    // Build a simple JSON string. 
-    // Example output: {"State": 30}
-    sPayload := CONCAT('{"State": ', TO_STRING(eCurrentState));
+    // Convert numbers to strings first
+    sStateStr := TO_STRING(eCurrentState);
+    sCutStr   := TO_STRING(udiCutsCompleted);
+    
+    // Build an Industry 4.0 JSON string. 
+    // Example output: {"State": 30, "CutsCompleted": 150}
+    sPayload := CONCAT('{"State": ', sStateStr);
+    sPayload := CONCAT(sPayload, ', "CutsCompleted": ');
+    sPayload := CONCAT(sPayload, sCutStr);
     sPayload := CONCAT(sPayload, '}');
     
     // Send it to the cloud

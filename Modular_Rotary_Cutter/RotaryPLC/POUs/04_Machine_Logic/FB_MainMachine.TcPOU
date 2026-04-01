@@ -218,7 +218,10 @@ RotaryKnife();
 // =========================================================
 // 6. TELEMETRY & CLOUD SYNC
 // =========================================================
-EdgeGateway(eCurrentState := eState);]]></ST>
+EdgeGateway(
+    eCurrentState := eState,
+    udiCutsCompleted := udiCutsCompleted
+);]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>
