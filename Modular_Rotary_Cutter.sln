@@ -13,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FD9F1D59-E000-42F3-8744-88DE1BE93C06}") = "Rotary_Scope", "Rotary_Scope\Rotary_Scope.tcmproj", "{C26B7517-1B67-44C6-88C3-47DE44B6E9F6}"
 EndProject
-Project("{BACAAE27-5D5D-4513-97FF-0FED82FEF961}") = "OPC UA Server", "OPC UA Server\OPC UA Server.tcconnproj", "{20E2347F-0246-42AD-A7D0-67798273D816}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|TwinCAT CE7 (ARMV7) = Debug|TwinCAT CE7 (ARMV7)
@@ -119,24 +117,6 @@ Global
 		{75F9DD5C-BCD5-4D5E-908B-B26714A659D9}.Release|TwinCAT RT (x64).Build.0 = Release|TwinCAT RT (x64)
 		{75F9DD5C-BCD5-4D5E-908B-B26714A659D9}.Release|TwinCAT RT (x86).ActiveCfg = Release|TwinCAT RT (x86)
 		{75F9DD5C-BCD5-4D5E-908B-B26714A659D9}.Release|TwinCAT RT (x86).Build.0 = Release|TwinCAT RT (x86)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT CE7 (ARMV7).ActiveCfg = Debug|TwinCAT CE7 (ARMV7)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT OS (ARMT2).ActiveCfg = Debug|TwinCAT OS (ARMT2)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT OS (ARMV7-A).ActiveCfg = Debug|TwinCAT OS (ARMT2)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT OS (ARMV7-M).ActiveCfg = Debug|TwinCAT OS (ARMT2)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT OS (ARMV8-A).ActiveCfg = Debug|TwinCAT OS (ARMT2)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT OS (x64).ActiveCfg = Debug|TwinCAT OS (x64)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT OS (x64-E).ActiveCfg = Debug|TwinCAT OS (x64)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT RT (x64).ActiveCfg = Debug|TwinCAT RT (x64)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Debug|TwinCAT RT (x86).ActiveCfg = Debug|TwinCAT RT (x86)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT CE7 (ARMV7).ActiveCfg = Release|TwinCAT CE7 (ARMV7)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT OS (ARMT2).ActiveCfg = Release|TwinCAT OS (ARMT2)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT OS (ARMV7-A).ActiveCfg = Release|TwinCAT OS (ARMT2)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT OS (ARMV7-M).ActiveCfg = Release|TwinCAT OS (ARMT2)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT OS (ARMV8-A).ActiveCfg = Release|TwinCAT OS (ARMT2)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT OS (x64).ActiveCfg = Release|TwinCAT OS (x64)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT OS (x64-E).ActiveCfg = Release|TwinCAT OS (x64)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT RT (x64).ActiveCfg = Release|TwinCAT RT (x64)
-		{20E2347F-0246-42AD-A7D0-67798273D816}.Release|TwinCAT RT (x86).ActiveCfg = Release|TwinCAT RT (x86)
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

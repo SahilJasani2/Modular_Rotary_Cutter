@@ -5,6 +5,7 @@
 VAR
     // This is the single instance of our entire modular machine.
     // By keeping it here, we keep the global namespace perfectly clean.
+	{attribute 'OPC.UA.DA' := '1'}
     RotaryCutter : FB_MainMachine;
 END_VAR]]></Declaration>
     <Implementation>

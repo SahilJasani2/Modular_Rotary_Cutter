@@ -39,18 +39,31 @@ fbMoveVel(Axis := Axis);
 fbHome(Axis := Axis);
 
 // =========================================================
-// STEP 14: TRIGGER RESET LOGIC
+// CORRECTED TRIGGER RESET LOGIC
 // =========================================================
-// After the blocks have been called above, we force the 'Execute' 
-// signals back to FALSE. This ensures that the next time a Method 
-// is called, the block sees a clean FALSE -> TRUE rising edge.
-// =========================================================
+// The Execute signals are now only dropped once the NC block 
+// finishes its operation. This ensures the FB state machines 
+// complete their execution and accurately reflect P_Busy.
 
-fbReset.Execute   := FALSE;
-fbStop.Execute    := FALSE;
-fbMoveAbs.Execute := FALSE;
-fbMoveVel.Execute := FALSE;
-fbHome.Execute    := FALSE;]]></ST>
+IF fbReset.Done OR fbReset.Error THEN
+    fbReset.Execute := FALSE;
+END_IF
+
+IF fbStop.Done OR fbStop.CommandAborted OR fbStop.Error THEN
+    fbStop.Execute := FALSE;
+END_IF
+
+IF fbMoveAbs.Done OR fbMoveAbs.CommandAborted OR fbMoveAbs.Error THEN
+    fbMoveAbs.Execute := FALSE;
+END_IF
+
+IF fbMoveVel.CommandAborted OR fbMoveVel.Error THEN
+    fbMoveVel.Execute := FALSE;
+END_IF
+
+IF fbHome.Done OR fbHome.CommandAborted OR fbHome.Error THEN
+    fbHome.Execute := FALSE;
+END_IF]]></ST>
     </Implementation>
     <Method Name="M_Home" Id="{7790ed11-5148-4807-a00e-287e41768cda}">
       <Declaration><![CDATA[METHOD M_Home : BOOL

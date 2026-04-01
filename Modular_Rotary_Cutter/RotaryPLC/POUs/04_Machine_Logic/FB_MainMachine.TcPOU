@@ -83,8 +83,8 @@ CASE eState OF
         // Trigger the homing routine we built in Phase 1
         RotaryKnife.bHomeCommand := TRUE;
         
-        // Wait for the knife to finish homing before moving to EXECUTE
-        IF NOT RotaryKnife.iMotor.P_Busy THEN 
+        // PHASE 2 FIX: Wait for homing to finish AND ensure no NC errors
+        IF NOT RotaryKnife.iMotor.P_Busy AND NOT RotaryKnife.iMotor.P_Error THEN 
             RotaryKnife.bHomeCommand := FALSE;
             eState := E_MachineState.EXECUTE;
         END_IF
@@ -130,6 +130,14 @@ CASE eState OF
     E_MachineState.ABORTING:
         // Drop logical commands
         RotaryKnife.bSyncCommand := FALSE;
+        
+        // PHASE 2 FIX: Active braking for process faults (e.g., Jam)
+        // If safety is still OK, we use servo torque to brake rather than coasting
+        IF bSafetyOk THEN
+            ConveyorMotor.M_Stop();
+            KnifeMotor.M_Stop();
+        END_IF
+        
         eState := E_MachineState.ABORTED;
 
     E_MachineState.ABORTED:
@@ -146,6 +154,10 @@ CASE eState OF
         
         fbAlarmSafety.Confirm(0);
         fbAlarmSafety.Clear(0, TRUE);
+        
+        // PHASE 1 FIX: Clear physical NC Axis faults before restarting
+        ConveyorMotor.M_Reset();
+        KnifeMotor.M_Reset();
         
         eState := E_MachineState.STOPPED;
 
@@ -185,9 +197,10 @@ END_IF
 // =========================================================
 // 4. HARDWARE SAFETY MASK (Absolute Override)
 // =========================================================
-// No matter what the State Machine above is doing, if safety is lost, 
-// or we are in a fault state, physically drop actuator power.
-IF NOT bSafetyOk OR eState = E_MachineState.ABORTING OR eState = E_MachineState.ABORTED THEN
+// PHASE 2 FIX: Removed 'eState = ABORTING/ABORTED' from the override.
+// If it's a jam, we WANT the drives to remain enabled (holding position/braking).
+// We ONLY forcefully drop actuator power if the physical safety loop is broken.
+IF NOT bSafetyOk THEN
     RotaryKnife.bEnable := FALSE;
     RotaryKnife.bSyncCommand := FALSE;
     InfeedConveyor.bEnable := FALSE; 
