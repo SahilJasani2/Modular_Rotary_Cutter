@@ -8,7 +8,8 @@ VAR_INPUT
     
     // --- Commands from Main Machine ---
     bEnable         : BOOL;
-    bSyncCommand    : BOOL;
+    {attribute 'TcLinkTo' := '1'}
+	bSyncCommand AT %Q* : BOOL;
     bHomeCommand    : BOOL;  // <--- NEW: Request to find Zero position
 
     // --- NEW: Machine Parameters ---

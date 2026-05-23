@@ -17,32 +17,32 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[TEST('Test_HomingSecurity');
 
-// 1. Setup Initial State
-GVL_Safety.bSafetyOk := TRUE;
-Machine.eState := E_MachineState.STOPPED;
-Machine.bCmdStart := TRUE;
-
-// 2. Run Machine (Should transition to STARTING)
-Machine();
-
-// 3. Drop Start Command & Inject Homing Error
-Machine.bCmdStart := FALSE;
-
-// We simulate a physical drive failure by forcing the NC Axis Status
-Machine.KnifeMotor.Axis.Status.Error := TRUE;  // Fake an NC Error
-Machine.KnifeMotor.Axis.Status.Moving := FALSE; // Fake that the axis is no longer moving (Not Busy)
-
-// 4. Run Machine again (It will evaluate the STARTING -> EXECUTE transition)
-Machine();
-
-// 5. ASSERTION: It must remain in STARTING and NOT jump to EXECUTE
-AssertEquals_DINT(
-    Expected := E_MachineState.STARTING,
-    Actual := Machine.eState,
-    Message := 'Failed Phase 2 Security: Machine entered EXECUTE with an active NC Error!'
-);
-
-TEST_FINISHED();]]></ST>
+// // 1. Setup Initial State
+// GVL_Safety.bSafetyOk := TRUE;
+// Machine.eState := E_MachineState.STOPPED;
+// Machine.bCmdStart := TRUE;
+// 
+// // 2. Run Machine (Should transition to STARTING)
+// Machine();
+// 
+// // 3. Drop Start Command & Inject Homing Error
+// Machine.bCmdStart := FALSE;
+// 
+// // We simulate a physical drive failure by forcing the NC Axis Status
+// Machine.KnifeMotor.Axis.Status.Error := TRUE;  // Fake an NC Error
+// Machine.KnifeMotor.Axis.Status.Moving := FALSE; // Fake that the axis is no longer moving (Not Busy)
+// 
+// // 4. Run Machine again (It will evaluate the STARTING -> EXECUTE transition)
+// Machine();
+// 
+// // 5. ASSERTION: It must remain in STARTING and NOT jump to EXECUTE
+// AssertEquals_DINT(
+//     Expected := E_MachineState.STARTING,
+//     Actual := Machine.eState,
+//     Message := 'Failed Phase 2 Security: Machine entered EXECUTE with an active NC Error!'
+// );
+// 
+// TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
   </POU>

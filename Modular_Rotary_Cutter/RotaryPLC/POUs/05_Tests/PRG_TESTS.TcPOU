@@ -8,10 +8,7 @@ VAR
     
     // NEW: Add the Main Machine test suite
     MainMachineTest   : FB_MainMachine_Test; 
-END_VAR
-
-// This is the master command that tells TcUnit to run all tests and print the results
-TcUnit.RUN();]]></Declaration>
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// This is the master command that tells TcUnit to run all tests and print the results
 TcUnit.RUN();]]></ST>

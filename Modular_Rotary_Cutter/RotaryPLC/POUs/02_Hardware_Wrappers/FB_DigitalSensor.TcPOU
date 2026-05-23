@@ -8,7 +8,8 @@ VAR_INPUT
     
     // NEW: HiL Simulation Hooks
     bSimulationMode  : BOOL; // TRUE = Ignore physical %I*, use bSimulationInput
-    bSimulationInput : BOOL; // Python Twin will write to this via ADS
+    {attribute 'TcLinkTo' := '1'}
+	bSimulationInput AT %I* : BOOL;
 END_VAR
 VAR
     // Internal State (Private)
