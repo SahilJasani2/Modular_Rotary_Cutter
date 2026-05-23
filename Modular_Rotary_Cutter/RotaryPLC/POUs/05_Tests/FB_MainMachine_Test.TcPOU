@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_MainMachine_Test" Id="{d5b27877-f183-4bba-9f90-50e27092c0bd}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MainMachine_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    // The machine instance we are going to test
+    Machine : FB_MainMachine;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Call the test methods here
+Test_HomingSecurity();]]></ST>
+    </Implementation>
+    <Method Name="Test_HomingSecurity" Id="{240d4f0b-4306-4800-907f-29f4ea64465c}">
+      <Declaration><![CDATA[METHOD Test_HomingSecurity
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_HomingSecurity');
+
+// 1. Setup Initial State
+GVL_Safety.bSafetyOk := TRUE;
+Machine.eState := E_MachineState.STOPPED;
+Machine.bCmdStart := TRUE;
+
+// 2. Run Machine (Should transition to STARTING)
+Machine();
+
+// 3. Drop Start Command & Inject Homing Error
+Machine.bCmdStart := FALSE;
+
+// We simulate a physical drive failure by forcing the NC Axis Status
+Machine.KnifeMotor.Axis.Status.Error := TRUE;  // Fake an NC Error
+Machine.KnifeMotor.Axis.Status.Moving := FALSE; // Fake that the axis is no longer moving (Not Busy)
+
+// 4. Run Machine again (It will evaluate the STARTING -> EXECUTE transition)
+Machine();
+
+// 5. ASSERTION: It must remain in STARTING and NOT jump to EXECUTE
+AssertEquals_DINT(
+    Expected := E_MachineState.STARTING,
+    Actual := Machine.eState,
+    Message := 'Failed Phase 2 Security: Machine entered EXECUTE with an active NC Error!'
+);
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

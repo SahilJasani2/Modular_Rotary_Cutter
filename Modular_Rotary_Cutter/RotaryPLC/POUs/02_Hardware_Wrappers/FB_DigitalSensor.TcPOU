@@ -3,27 +3,45 @@
   <POU Name="FB_DigitalSensor" Id="{6a39500a-bba7-4420-a58b-3b1e1df2d295}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_DigitalSensor IMPLEMENTS I_DigitalSensor
 VAR_INPUT
-    // Now this is an input, our test can write to it!
+    // The physical hardware terminal mapping
     bRawInput AT %I* : BOOL; 
+    
+    // NEW: HiL Simulation Hooks
+    bSimulationMode  : BOOL; // TRUE = Ignore physical %I*, use bSimulationInput
+    bSimulationInput : BOOL; // Python Twin will write to this via ADS
 END_VAR
 VAR
     // Internal State (Private)
-    bActive : BOOL;
-    bInvert : BOOL;
+    bActive         : BOOL;
+    bEffectiveInput : BOOL; // Multiplexer output
+    bInvert         : BOOL;
     
     // Edge Detection
     fbRisingEdge  : R_TRIG;
     fbFallingEdge : F_TRIG;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// 1. Handle the Hardware Wiring (Normally Open vs Normally Closed)
-IF bInvert THEN
-    bActive := NOT bRawInput;
+      <ST><![CDATA[// =========================================================
+// 1. HARDWARE VS. SIMULATION MULTIPLEXER
+// =========================================================
+IF bSimulationMode THEN
+    bEffectiveInput := bSimulationInput; // Listen to Python Twin
 ELSE
-    bActive := bRawInput;
+    bEffectiveInput := bRawInput;        // Listen to Physical IO Terminal
 END_IF
 
-// 2. Run the Edge Detection Blocks
+// =========================================================
+// 2. Handle Wiring Logic (Normally Open vs Normally Closed)
+// =========================================================
+IF bInvert THEN
+    bActive := NOT bEffectiveInput;
+ELSE
+    bActive := bEffectiveInput;
+END_IF
+
+// =========================================================
+// 3. Run the Edge Detection Blocks
+// =========================================================
 fbRisingEdge(CLK := bActive);
 fbFallingEdge(CLK := bActive);]]></ST>
     </Implementation>

@@ -53,13 +53,20 @@ class RotaryCutterTwin:
         self.PATH_START   = "MAIN.RotaryCutter.bCmdStart"
         self.PATH_RESET   = "MAIN.RotaryCutter.bCmdReset"
         self.PATH_STATE   = "MAIN.RotaryCutter.eState"
-        self.PATH_SENSOR  = "MAIN.RotaryCutter.fbProductSensor.bRawInput"
+        
+        # PHASE 3 FIX: Target the new virtual simulation input to avoid IO overwrites
+        self.PATH_SENSOR  = "MAIN.RotaryCutter.fbProductSensor.bSimulationInput"
+        
         self.PATH_CHOP    = "MAIN.RotaryCutter.RotaryKnife.bSyncCommand"
         # Safety Bridge Path
         self.PATH_SAFETY  = "GVL_Safety.bSafetyOk"
 
     def connect(self):
         self.plc.open()
+        
+        # PHASE 3 FIX: Tell the PLC to decouple the sensor from the physical %I* terminal
+        self.plc.write_by_name("MAIN.RotaryCutter.fbProductSensor.bSimulationMode", True, pyads.PLCTYPE_BOOL)
+        
         # Initialize Safety to TRUE so the machine can start
         self.plc.write_by_name(self.PATH_SAFETY, True, pyads.PLCTYPE_BOOL)
         IndustrialLogger.success(f"ADS Connection Established & Safety OK. NetID: {self.ams_id}")

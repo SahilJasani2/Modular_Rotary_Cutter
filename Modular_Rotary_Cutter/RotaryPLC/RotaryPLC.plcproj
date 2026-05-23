@@ -9,7 +9,7 @@
     <WriteProductVersion>false</WriteProductVersion>
     <GenerateTpy>false</GenerateTpy>
     <Name>RotaryPLC</Name>
-    <ProgramVersion>3.1.4026.20</ProgramVersion>
+    <ProgramVersion>3.1.4026.22</ProgramVersion>
     <Application>{13cad0dd-8852-465e-bf06-547e78e770c8}</Application>
     <TypeSystem>{978542b9-f766-4856-b429-6d90696972f4}</TypeSystem>
     <Implicit_Task_Info>{a7b78a10-5133-491d-b437-e0e1b05bf077}</Implicit_Task_Info>
@@ -51,6 +51,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\05_Tests\FB_DigitalSensor_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\05_Tests\FB_MainMachine_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\05_Tests\PRG_TESTS.TcPOU">
