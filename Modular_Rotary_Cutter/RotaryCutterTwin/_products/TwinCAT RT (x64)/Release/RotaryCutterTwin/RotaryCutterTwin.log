@@ -1,0 +1,6 @@
+﻿  Extracting version information from 'D:\04_side_projects\Modular_Rotary_Cutter\Modular_Rotary_Cutter\RotaryCutterTwin\RotaryCutterTwin.rc' importing additional information from 'D:\04_side_projects\Modular_Rotary_Cutter\Modular_Rotary_Cutter\RotaryCutterTwin\RotaryCutterTwin.tmc and 'C:\Program Files (x86)\Beckhoff\TwinCAT\3.1\SDK\\TwinCATVersion.xml'
+  TcPch.cpp
+  MovingMaterialSim.cpp
+  RotaryCutterTwinClassFactory.cpp
+  RotaryCutterTwinDriver.cpp
+  RotaryCutterTwin.vcxproj -> D:\04_side_projects\Modular_Rotary_Cutter\Modular_Rotary_Cutter\RotaryCutterTwin\_products\TwinCAT RT (x64)\Release\RotaryCutterTwin.tmx

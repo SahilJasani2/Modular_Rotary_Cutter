@@ -2,46 +2,50 @@
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_MainMachine" Id="{7d03d295-f101-4685-8cbf-a1d2f35ed8c9}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MainMachine
+VAR_INPUT
+    // --- Operator Commands ---
+    {attribute 'OPC.UA.DA' := '1'}
+    bCmdStart       : BOOL;
+    
+    {attribute 'OPC.UA.DA' := '1'}
+    bCmdStop        : BOOL;
+    
+    {attribute 'OPC.UA.DA' := '1'}
+    bCmdReset       : BOOL;
+END_VAR
+
+VAR_OUTPUT
+    // --- State Machine Tracking ---
+    {attribute 'OPC.UA.DA' := '1'}
+    eState          : E_MachineState := E_MachineState.STOPPED;
+    
+    {attribute 'OPC.UA.DA' := '1'}
+    udiCutsCompleted : UDINT;
+END_VAR
+
 VAR
-    // --- The Physical Modules ---
+    // --- The Physical Modules (Private) ---
     InfeedConveyor  : FB_InfeedConveyor;
     RotaryKnife     : FB_RotaryKnife;
     
-    // --- The Virtual Motors ---
+    // --- The Virtual Motors (Private) ---
     ConveyorMotor   : FB_Drive;
     KnifeMotor      : FB_Drive;
 
-    // --- Concrete Hardware Instances for Simulation ---
+    // --- Concrete Hardware Instances for Simulation (Private) ---
     fbProductSensor : FB_DigitalSensor;
     
-    // --- Edge/IoT Telemetry ---
+    // --- Edge/IoT Telemetry (Private) ---
     EdgeGateway     : FB_Telemetry;
     
-    // --- State Machine Tracking ---
-	{attribute 'OPC.UA.DA' := '1'}
-    eState          : E_MachineState := E_MachineState.STOPPED;
-	
-	{attribute 'OPC.UA.DA' := '1'}
-    udiCutsCompleted : UDINT;
-    
-    // --- Operator Commands ---
-	{attribute 'OPC.UA.DA' := '1'}
-    bCmdStart       : BOOL;
-	
-	{attribute 'OPC.UA.DA' := '1'}
-    bCmdStop        : BOOL;
-	
-	{attribute 'OPC.UA.DA' := '1'}
-    bCmdReset       : BOOL;
-    
-    // --- Industrial Diagnostics (Alarms) ---
+    // --- Industrial Diagnostics (Alarms) (Private) ---
     fbEventLogger      : FB_TcEventLogger;
     fbAlarmJam         : FB_TcAlarm;      // Alarm for material jams
     fbAlarmSafety      : FB_TcAlarm;      // Alarm for E-Stop / Safety Trips
     bAlarmsInitialized : BOOL;            // Flag to run setup code only once
     tonSensorJam       : TON;             // Detects if material is stuck
     
-    // --- Safety Interface ---
+    // --- Safety Interface (Private) ---
     bSafetyOk          : BOOL;            // Locally mapped safety signal
 END_VAR]]></Declaration>
     <Implementation>

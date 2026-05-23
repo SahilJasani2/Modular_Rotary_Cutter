@@ -20,11 +20,13 @@
 			</Hides>
 		</DataType>
 	</DataTypes>
-	<Project ProjectGUID="{1CD0E429-F044-4E22-88B7-CF7EE53EF161}" TargetNetId="199.4.42.250.1.1" Target64Bit="true" ShowHideConfigurations="#x6">
+	<Project ProjectGUID="{1CD0E429-F044-4E22-88B7-CF7EE53EF161}" Target64Bit="true" ShowHideConfigurations="#x6">
 		<System>
 			<Licenses>
 				<Target>
+					<ManualSelect>{304D006A-8299-4560-AB79-438534B50288}</ManualSelect>
 					<ManualSelect>{BDCC0070-42D5-49AE-ABF1-1D4434813D60}</ManualSelect>
+					<ManualSelect>{AD7F40C3-F160-4413-83E3-6B7656A795A2}</ManualSelect>
 				</Target>
 			</Licenses>
 			<Tasks>
@@ -36,5 +38,8 @@
 		<Plc>
 			<Project File="RotaryPLC.xti"/>
 		</Plc>
+		<Cpp>
+			<Project File="RotaryCutterTwin.xti"/>
+		</Cpp>
 	</Project>
 </TcSmProject>
