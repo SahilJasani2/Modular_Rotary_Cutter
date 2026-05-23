@@ -59,7 +59,8 @@ IF fbMoveAbs.Done OR fbMoveAbs.CommandAborted OR fbMoveAbs.Error THEN
     fbMoveAbs.Execute := FALSE;
 END_IF
 
-IF fbMoveVel.CommandAborted OR fbMoveVel.Error THEN
+// ---> FIX: Now includes fbMoveVel.InVelocity to unlock the master profile
+IF fbMoveVel.InVelocity OR fbMoveVel.CommandAborted OR fbMoveVel.Error THEN
     fbMoveVel.Execute := FALSE;
 END_IF
 

@@ -2,32 +2,27 @@
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_RotaryKnife" Id="{48fb6193-f953-456c-9937-b4916335cb68}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RotaryKnife
+VAR_IN_OUT
+    // --- Strict Compile-Time Hardware Bindings ---
+    MasterAxis : AXIS_REF;
+    SlaveAxis  : AXIS_REF;
+END_VAR
 VAR_INPUT
-    // --- Hardware Link ---
     iMotor          : I_Drive;
-    
-    // --- Commands from Main Machine ---
     bEnable         : BOOL;
+    bEngageGearing  : BOOL; 
+    
     {attribute 'TcLinkTo' := '1'}
-	bSyncCommand AT %Q* : BOOL;
-    bHomeCommand    : BOOL;  // <--- NEW: Request to find Zero position
-
-    // --- NEW: Machine Parameters ---
-    fKnifeDiameter  : LREAL := 100.0; // Moved from VAR to VAR_INPUT
+    bSyncCommand AT %Q* : BOOL;
+    
+    bHomeCommand    : BOOL;  
+    fKnifeDiameter  : LREAL := 100.0; 
 END_VAR
 VAR
-    // --- Master Reference ---
-    pMasterAxis     : REFERENCE TO AXIS_REF;
-    
-    // --- Motion Control Blocks ---
     fbGearIn        : MC_GearIn;
     fbGearOut       : MC_GearOut;
-    rtHome          : R_TRIG; // <--- NEW: Rising edge trigger for homing
+    rtHome          : R_TRIG; 
     
-    // --- Configuration ---
-    fGearRatio      : LREAL := 1.0;
-    
-    // --- Status ---
     bIsSynchronized : BOOL;
     bError          : BOOL;
 END_VAR]]></Declaration>
@@ -40,37 +35,34 @@ IF iMotor <> 0 THEN
     bError := iMotor.P_Error;
 
     // =========================================================
-    // 3. NEW: HOMING SEQUENCE
+    // 3. HOMING SEQUENCE
     // =========================================================
     rtHome(CLK := bHomeCommand);
     IF rtHome.Q THEN
-        iMotor.M_Home(); // Trigger the hardware wrapper homing method!
+        iMotor.M_Home(); 
     END_IF
 
     // =========================================================
     // 4. ELECTRONIC GEARING (Synchronization)
     // =========================================================
-    IF __ISVALIDREF(pMasterAxis) THEN
-        
-        // Command to Lock the Knife to the Conveyor
-        fbGearIn(
-            Master           := pMasterAxis,
-            Slave            := iMotor.P_Axis, 
-            Execute          := bSyncCommand,
-            RatioNumerator   := 1,
-            RatioDenominator := 1,
-            Acceleration     := 1000,
-            Deceleration     := 1000
-        );
-        
-        bIsSynchronized := fbGearIn.InGear;
-        
-        // Command to Unlock (Stop following)
-        fbGearOut(
-            Slave            := iMotor.P_Axis,
-            Execute          := NOT bSyncCommand AND bIsSynchronized
-        );
-    END_IF
+    // Command to Lock the Knife to the Conveyor
+    fbGearIn(
+        Master           := MasterAxis,
+        Slave            := SlaveAxis, 
+        Execute          := bEngageGearing, 
+        RatioNumerator   := 1,
+        RatioDenominator := 1,
+        Acceleration     := 10000,
+        Deceleration     := 10000
+    );
+    
+    bIsSynchronized := fbGearIn.InGear;
+    
+    // Command to Unlock (Stop following)
+    fbGearOut(
+        Slave            := SlaveAxis,
+        Execute          := NOT bEngageGearing AND bIsSynchronized 
+    );
     
 END_IF]]></ST>
     </Implementation>

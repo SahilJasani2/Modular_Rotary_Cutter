@@ -5,23 +5,24 @@
 VAR_INPUT
     iMotor          : I_Drive;
     iProductCam     : I_DigitalSensor;
-    
-    // --- NEW: Commands from Main Machine ---
-    bEnable         : BOOL; // <--- ADD THIS LINE
-    
-    // --- Machine Parameters ---
+    bEnable         : BOOL; 
     fTargetVelocity : LREAL := 100.0;
 END_VAR
 VAR
+    // --- NEW: Edge trigger to prevent command spamming ---
+    rtEnable        : R_TRIG; 
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// The conveyor is very simple for now. 
-// It just ensures the motor is enabled and running.
+      <ST><![CDATA[// Monitor the enable signal for a rising edge (OFF to ON)
+rtEnable(CLK := bEnable);
+
 IF iMotor <> 0 THEN
     iMotor.P_Enabled := bEnable;
     
-    // ADDED: The required nDirection parameter to satisfy the interface
-    iMotor.M_MoveVelocity(fVelocity := fTargetVelocity, nDirection := 1);
+    // ONLY send the velocity command ONCE when the conveyor first turns on
+    IF rtEnable.Q THEN
+        iMotor.M_MoveVelocity(fVelocity := fTargetVelocity, nDirection := 1);
+    END_IF
 END_IF]]></ST>
     </Implementation>
   </POU>

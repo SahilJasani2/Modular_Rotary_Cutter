@@ -97,23 +97,20 @@ CASE eState OF
             ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_HINT, msgFmtStr := '>>> MACHINE STARTED: Reached EXECUTE State <<<', strArg := '');
         END_IF
 
-    E_MachineState.EXECUTE:
+	E_MachineState.EXECUTE:
         RotaryKnife.bEnable := TRUE;
         InfeedConveyor.bEnable := TRUE; 
 
-        // --- NEW: Run the Master Conveyor at a constant speed ---
-        // Parameter 1: Velocity (e.g., 500 mm/sec)
-        // Parameter 2: Direction (1 = Positive)
-        ConveyorMotor.M_MoveVelocity(500.0, 1);
-
-        // Ninja Chop Logic (We will replace this with Gearing soon, but keep it for now)
+        // Ninja Chop Logic (Now with real NC Physics!)
         IF fbProductSensor.P_RisingEdge THEN
-            RotaryKnife.bSyncCommand := TRUE;
+            RotaryKnife.bEngageGearing := TRUE; 
+            RotaryKnife.bSyncCommand   := TRUE; 
             ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_HINT, msgFmtStr := '>>> C++ HANDSHAKE OK: Product Detected! <<<', strArg := '');
         END_IF
         
         IF fbProductSensor.P_FallingEdge THEN
-            RotaryKnife.bSyncCommand := FALSE;
+            RotaryKnife.bEngageGearing := FALSE; 
+            RotaryKnife.bSyncCommand   := FALSE; 
             udiCutsCompleted := udiCutsCompleted + 1;
         END_IF
         
@@ -230,8 +227,11 @@ ConveyorMotor(Axis := GVL_Motion.stConveyorAxis);
 KnifeMotor(Axis := GVL_Motion.stKnifeAxis);
 
 InfeedConveyor();
-RotaryKnife();
 
+RotaryKnife(
+    MasterAxis := GVL_Motion.stConveyorAxis,
+    SlaveAxis  := GVL_Motion.stKnifeAxis
+);
 // =========================================================
 // 6. TELEMETRY & CLOUD SYNC
 // =========================================================
