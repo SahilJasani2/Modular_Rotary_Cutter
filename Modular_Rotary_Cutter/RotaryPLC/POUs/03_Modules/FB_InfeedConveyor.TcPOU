@@ -19,7 +19,9 @@ END_VAR]]></Declaration>
 // It just ensures the motor is enabled and running.
 IF iMotor <> 0 THEN
     iMotor.P_Enabled := bEnable;
-    iMotor.M_MoveVel(fVelocity := fTargetVelocity);
+    
+    // ADDED: The required nDirection parameter to satisfy the interface
+    iMotor.M_MoveVelocity(fVelocity := fTargetVelocity, nDirection := 1);
 END_IF]]></ST>
     </Implementation>
   </POU>

@@ -60,6 +60,7 @@
           <AmsNetId>199.4.42.250.1.1</AmsNetId>
           <Area>Local</Area>
           <ArrayLength>0</ArrayLength>
+          <ArrayStartIndex>0</ArrayStartIndex>
           <BaseSampleTime>100000</BaseSampleTime>
           <ChannelStyleInformation />
           <Comment> --- State Machine Tracking ---</Comment>
@@ -80,7 +81,7 @@
           <DataType>INT16</DataType>
           <DisplayColor>Black</DisplayColor>
           <Enabled>true</Enabled>
-          <FileHandle>1</FileHandle>
+          <FileHandle>0</FileHandle>
           <ForceOversampling>false</ForceOversampling>
           <Guid>714e5ce2-983c-47fd-b56b-6cc97f03e85f</Guid>
           <IndexGroup>16448</IndexGroup>
@@ -96,15 +97,15 @@
               <Name>None</Name>
               <ScaleFactor>1</ScaleFactor>
               <SourceUnitPrefix>none</SourceUnitPrefix>
-              <SourceUnitString />
+              <SourceUnitString></SourceUnitString>
               <Symbol>1</Symbol>
-              <TargetUnitString />
+              <TargetUnitString></TargetUnitString>
               <TargetUnitValue>0</TargetUnitValue>
             </Transformation>
             <Unit>
-              <BaseUnitString />
+              <BaseUnitString></BaseUnitString>
               <BaseUnitValue>0</BaseUnitValue>
-              <NameExtension />
+              <NameExtension></NameExtension>
               <Offset>0</Offset>
               <Prefix>none</Prefix>
               <ReturnText> (None) </ReturnText>
@@ -115,10 +116,10 @@
             <UnitScaleResult>1</UnitScaleResult>
             <UserUnit>
               <BaseName>UnitOfOne</BaseName>
-              <BaseUnitString />
+              <BaseUnitString></BaseUnitString>
               <BaseUnitValue>0</BaseUnitValue>
               <Name>None</Name>
-              <NameExtension />
+              <NameExtension></NameExtension>
               <Offset>0</Offset>
               <Prefix>none</Prefix>
               <ScaleFactor>1</ScaleFactor>
@@ -194,6 +195,7 @@
           <AmsNetId>199.4.42.250.1.1</AmsNetId>
           <Area>Local</Area>
           <ArrayLength>0</ArrayLength>
+          <ArrayStartIndex>0</ArrayStartIndex>
           <BaseSampleTime>100000</BaseSampleTime>
           <ChannelStyleInformation />
           <Comment> Now this is an input, our test can write to it!</Comment>
@@ -214,7 +216,7 @@
           <DataType>BIT</DataType>
           <DisplayColor>Black</DisplayColor>
           <Enabled>true</Enabled>
-          <FileHandle>2</FileHandle>
+          <FileHandle>0</FileHandle>
           <ForceOversampling>false</ForceOversampling>
           <Guid>dded45b5-2283-4670-bbee-39135ac2012c</Guid>
           <IndexGroup>61472</IndexGroup>
@@ -230,15 +232,15 @@
               <Name>None</Name>
               <ScaleFactor>1</ScaleFactor>
               <SourceUnitPrefix>none</SourceUnitPrefix>
-              <SourceUnitString />
+              <SourceUnitString></SourceUnitString>
               <Symbol>1</Symbol>
-              <TargetUnitString />
+              <TargetUnitString></TargetUnitString>
               <TargetUnitValue>0</TargetUnitValue>
             </Transformation>
             <Unit>
-              <BaseUnitString />
+              <BaseUnitString></BaseUnitString>
               <BaseUnitValue>0</BaseUnitValue>
-              <NameExtension />
+              <NameExtension></NameExtension>
               <Offset>0</Offset>
               <Prefix>none</Prefix>
               <ReturnText> (None) </ReturnText>
@@ -249,10 +251,10 @@
             <UnitScaleResult>1</UnitScaleResult>
             <UserUnit>
               <BaseName>UnitOfOne</BaseName>
-              <BaseUnitString />
+              <BaseUnitString></BaseUnitString>
               <BaseUnitValue>0</BaseUnitValue>
               <Name>None</Name>
-              <NameExtension />
+              <NameExtension></NameExtension>
               <Offset>0</Offset>
               <Prefix>none</Prefix>
               <ScaleFactor>1</ScaleFactor>
@@ -292,6 +294,7 @@
           <AmsNetId>199.4.42.250.1.1</AmsNetId>
           <Area>Local</Area>
           <ArrayLength>0</ArrayLength>
+          <ArrayStartIndex>0</ArrayStartIndex>
           <BaseSampleTime>100000</BaseSampleTime>
           <ChannelStyleInformation />
           <Comment> rising edge at signal detected </Comment>
@@ -312,7 +315,7 @@
           <DataType>BIT</DataType>
           <DisplayColor>Black</DisplayColor>
           <Enabled>true</Enabled>
-          <FileHandle>3</FileHandle>
+          <FileHandle>0</FileHandle>
           <ForceOversampling>false</ForceOversampling>
           <Guid>88339034-3902-4282-a687-e020335d1635</Guid>
           <IndexGroup>16448</IndexGroup>
@@ -328,15 +331,15 @@
               <Name>None</Name>
               <ScaleFactor>1</ScaleFactor>
               <SourceUnitPrefix>none</SourceUnitPrefix>
-              <SourceUnitString />
+              <SourceUnitString></SourceUnitString>
               <Symbol>1</Symbol>
-              <TargetUnitString />
+              <TargetUnitString></TargetUnitString>
               <TargetUnitValue>0</TargetUnitValue>
             </Transformation>
             <Unit>
-              <BaseUnitString />
+              <BaseUnitString></BaseUnitString>
               <BaseUnitValue>0</BaseUnitValue>
-              <NameExtension />
+              <NameExtension></NameExtension>
               <Offset>0</Offset>
               <Prefix>none</Prefix>
               <ReturnText> (None) </ReturnText>
@@ -347,10 +350,10 @@
             <UnitScaleResult>1</UnitScaleResult>
             <UserUnit>
               <BaseName>UnitOfOne</BaseName>
-              <BaseUnitString />
+              <BaseUnitString></BaseUnitString>
               <BaseUnitValue>0</BaseUnitValue>
               <Name>None</Name>
-              <NameExtension />
+              <NameExtension></NameExtension>
               <Offset>0</Offset>
               <Prefix>none</Prefix>
               <ScaleFactor>1</ScaleFactor>
@@ -390,6 +393,7 @@
           <AmsNetId>199.4.42.250.1.1</AmsNetId>
           <Area>Local</Area>
           <ArrayLength>0</ArrayLength>
+          <ArrayStartIndex>0</ArrayStartIndex>
           <BaseSampleTime>100000</BaseSampleTime>
           <ChannelStyleInformation />
           <Comment> Request to 'Lock' to the conveyor</Comment>
@@ -410,7 +414,7 @@
           <DataType>BIT</DataType>
           <DisplayColor>Black</DisplayColor>
           <Enabled>true</Enabled>
-          <FileHandle>4</FileHandle>
+          <FileHandle>0</FileHandle>
           <ForceOversampling>false</ForceOversampling>
           <Guid>f53af58b-9e49-4c71-8dfd-5e198134e777</Guid>
           <IndexGroup>16448</IndexGroup>
@@ -426,15 +430,15 @@
               <Name>None</Name>
               <ScaleFactor>1</ScaleFactor>
               <SourceUnitPrefix>none</SourceUnitPrefix>
-              <SourceUnitString />
+              <SourceUnitString></SourceUnitString>
               <Symbol>1</Symbol>
-              <TargetUnitString />
+              <TargetUnitString></TargetUnitString>
               <TargetUnitValue>0</TargetUnitValue>
             </Transformation>
             <Unit>
-              <BaseUnitString />
+              <BaseUnitString></BaseUnitString>
               <BaseUnitValue>0</BaseUnitValue>
-              <NameExtension />
+              <NameExtension></NameExtension>
               <Offset>0</Offset>
               <Prefix>none</Prefix>
               <ReturnText> (None) </ReturnText>
@@ -445,10 +449,10 @@
             <UnitScaleResult>1</UnitScaleResult>
             <UserUnit>
               <BaseName>UnitOfOne</BaseName>
-              <BaseUnitString />
+              <BaseUnitString></BaseUnitString>
               <BaseUnitValue>0</BaseUnitValue>
               <Name>None</Name>
-              <NameExtension />
+              <NameExtension></NameExtension>
               <Offset>0</Offset>
               <Prefix>none</Prefix>
               <ScaleFactor>1</ScaleFactor>
@@ -550,6 +554,7 @@
                   <ShowName>False</ShowName>
                   <ShowUnit>None</ShowUnit>
                   <SortPriority>100</SortPriority>
+                  <StretchFactor>1</StretchFactor>
                   <SubGrid>false</SubGrid>
                   <SubGridDivisions>5</SubGridDivisions>
                   <Title>MeasurementMemberBase</Title>
@@ -588,6 +593,7 @@
                   <ShowName>False</ShowName>
                   <ShowUnit>AllChannels</ShowUnit>
                   <SortPriority>100</SortPriority>
+                  <StretchFactor>1</StretchFactor>
                   <SubGrid>false</SubGrid>
                   <SubGridDivisions>5</SubGridDivisions>
                   <Title>MeasurementMemberBase</Title>
@@ -629,15 +635,15 @@
                       <Name>None</Name>
                       <ScaleFactor>1</ScaleFactor>
                       <SourceUnitPrefix>none</SourceUnitPrefix>
-                      <SourceUnitString />
+                      <SourceUnitString></SourceUnitString>
                       <Symbol>1</Symbol>
-                      <TargetUnitString />
+                      <TargetUnitString></TargetUnitString>
                       <TargetUnitValue>0</TargetUnitValue>
                     </Transformation>
                     <Unit>
-                      <BaseUnitString />
+                      <BaseUnitString></BaseUnitString>
                       <BaseUnitValue>0</BaseUnitValue>
-                      <NameExtension />
+                      <NameExtension></NameExtension>
                       <Offset>0</Offset>
                       <Prefix>none</Prefix>
                       <ReturnText> (None) </ReturnText>
@@ -648,10 +654,10 @@
                     <UnitScaleResult>1</UnitScaleResult>
                     <UserUnit>
                       <BaseName>UnitOfOne</BaseName>
-                      <BaseUnitString />
+                      <BaseUnitString></BaseUnitString>
                       <BaseUnitValue>0</BaseUnitValue>
                       <Name>None</Name>
-                      <NameExtension />
+                      <NameExtension></NameExtension>
                       <Offset>0</Offset>
                       <Prefix>none</Prefix>
                       <ScaleFactor>1</ScaleFactor>
@@ -692,6 +698,7 @@
                       <DisplayColor>-16744448</DisplayColor>
                       <FillColor>838893568</FillColor>
                       <FillMode>None</FillMode>
+                      <GradientConfig>Colors:-7077677,-16776961,-16711681,-16711936,-65536;Thresholds:0.25,0.5,0.75,1</GradientConfig>
                       <Guid>1d2e8834-cce1-448d-9506-c67421fa37be</Guid>
                       <LineWidth>2</LineWidth>
                       <MarkColor>-16744448</MarkColor>
@@ -699,6 +706,9 @@
                       <MarkState>Auto</MarkState>
                       <Name>Series Style</Name>
                       <SeriesType>Line</SeriesType>
+                      <ShowBars>false</ShowBars>
+                      <ShowMesh>true</ShowMesh>
+                      <ShowMeshGrid>false</ShowMeshGrid>
                       <SortPriority>100</SortPriority>
                       <Title>MeasurementMemberBase</Title>
                     </SeriesStyle>
@@ -763,15 +773,15 @@
                       <Name>None</Name>
                       <ScaleFactor>1</ScaleFactor>
                       <SourceUnitPrefix>none</SourceUnitPrefix>
-                      <SourceUnitString />
+                      <SourceUnitString></SourceUnitString>
                       <Symbol>1</Symbol>
-                      <TargetUnitString />
+                      <TargetUnitString></TargetUnitString>
                       <TargetUnitValue>0</TargetUnitValue>
                     </Transformation>
                     <Unit>
-                      <BaseUnitString />
+                      <BaseUnitString></BaseUnitString>
                       <BaseUnitValue>0</BaseUnitValue>
-                      <NameExtension />
+                      <NameExtension></NameExtension>
                       <Offset>0</Offset>
                       <Prefix>none</Prefix>
                       <ReturnText> (None) </ReturnText>
@@ -782,10 +792,10 @@
                     <UnitScaleResult>1</UnitScaleResult>
                     <UserUnit>
                       <BaseName>UnitOfOne</BaseName>
-                      <BaseUnitString />
+                      <BaseUnitString></BaseUnitString>
                       <BaseUnitValue>0</BaseUnitValue>
                       <Name>None</Name>
-                      <NameExtension />
+                      <NameExtension></NameExtension>
                       <Offset>0</Offset>
                       <Prefix>none</Prefix>
                       <ScaleFactor>1</ScaleFactor>
@@ -826,6 +836,7 @@
                       <DisplayColor>-16776961</DisplayColor>
                       <FillColor>838861055</FillColor>
                       <FillMode>FromHorizontalZero</FillMode>
+                      <GradientConfig>Colors:-7077677,-16776961,-16711681,-16711936,-65536;Thresholds:0.25,0.5,0.75,1</GradientConfig>
                       <Guid>b3d0884d-b4d0-419b-b46f-79e20dacdee8</Guid>
                       <LineWidth>2</LineWidth>
                       <MarkColor>-16776961</MarkColor>
@@ -833,6 +844,9 @@
                       <MarkState>Auto</MarkState>
                       <Name>Series Style (1)</Name>
                       <SeriesType>Line</SeriesType>
+                      <ShowBars>false</ShowBars>
+                      <ShowMesh>true</ShowMesh>
+                      <ShowMeshGrid>false</ShowMeshGrid>
                       <SortPriority>100</SortPriority>
                       <Title>MeasurementMemberBase</Title>
                     </SeriesStyle>
@@ -897,15 +911,15 @@
                       <Name>None</Name>
                       <ScaleFactor>1</ScaleFactor>
                       <SourceUnitPrefix>none</SourceUnitPrefix>
-                      <SourceUnitString />
+                      <SourceUnitString></SourceUnitString>
                       <Symbol>1</Symbol>
-                      <TargetUnitString />
+                      <TargetUnitString></TargetUnitString>
                       <TargetUnitValue>0</TargetUnitValue>
                     </Transformation>
                     <Unit>
-                      <BaseUnitString />
+                      <BaseUnitString></BaseUnitString>
                       <BaseUnitValue>0</BaseUnitValue>
-                      <NameExtension />
+                      <NameExtension></NameExtension>
                       <Offset>0</Offset>
                       <Prefix>none</Prefix>
                       <ReturnText> (None) </ReturnText>
@@ -916,10 +930,10 @@
                     <UnitScaleResult>1</UnitScaleResult>
                     <UserUnit>
                       <BaseName>UnitOfOne</BaseName>
-                      <BaseUnitString />
+                      <BaseUnitString></BaseUnitString>
                       <BaseUnitValue>0</BaseUnitValue>
                       <Name>None</Name>
-                      <NameExtension />
+                      <NameExtension></NameExtension>
                       <Offset>0</Offset>
                       <Prefix>none</Prefix>
                       <ScaleFactor>1</ScaleFactor>
@@ -960,6 +974,7 @@
                       <DisplayColor>-23296</DisplayColor>
                       <FillColor>855614720</FillColor>
                       <FillMode>FromHorizontalZero</FillMode>
+                      <GradientConfig>Colors:-7077677,-16776961,-16711681,-16711936,-65536;Thresholds:0.25,0.5,0.75,1</GradientConfig>
                       <Guid>134f1a92-2f70-4460-bfbd-8c368c249e1b</Guid>
                       <LineWidth>2</LineWidth>
                       <MarkColor>-23296</MarkColor>
@@ -967,6 +982,9 @@
                       <MarkState>Auto</MarkState>
                       <Name>Series Style (2)</Name>
                       <SeriesType>Line</SeriesType>
+                      <ShowBars>false</ShowBars>
+                      <ShowMesh>true</ShowMesh>
+                      <ShowMeshGrid>false</ShowMeshGrid>
                       <SortPriority>100</SortPriority>
                       <Title>MeasurementMemberBase</Title>
                     </SeriesStyle>
@@ -1031,15 +1049,15 @@
                       <Name>None</Name>
                       <ScaleFactor>1</ScaleFactor>
                       <SourceUnitPrefix>none</SourceUnitPrefix>
-                      <SourceUnitString />
+                      <SourceUnitString></SourceUnitString>
                       <Symbol>1</Symbol>
-                      <TargetUnitString />
+                      <TargetUnitString></TargetUnitString>
                       <TargetUnitValue>0</TargetUnitValue>
                     </Transformation>
                     <Unit>
-                      <BaseUnitString />
+                      <BaseUnitString></BaseUnitString>
                       <BaseUnitValue>0</BaseUnitValue>
-                      <NameExtension />
+                      <NameExtension></NameExtension>
                       <Offset>0</Offset>
                       <Prefix>none</Prefix>
                       <ReturnText> (None) </ReturnText>
@@ -1050,10 +1068,10 @@
                     <UnitScaleResult>1</UnitScaleResult>
                     <UserUnit>
                       <BaseName>UnitOfOne</BaseName>
-                      <BaseUnitString />
+                      <BaseUnitString></BaseUnitString>
                       <BaseUnitValue>0</BaseUnitValue>
                       <Name>None</Name>
-                      <NameExtension />
+                      <NameExtension></NameExtension>
                       <Offset>0</Offset>
                       <Prefix>none</Prefix>
                       <ScaleFactor>1</ScaleFactor>
@@ -1094,6 +1112,7 @@
                       <DisplayColor>-16711936</DisplayColor>
                       <FillColor>838926080</FillColor>
                       <FillMode>FromHorizontalZero</FillMode>
+                      <GradientConfig>Colors:-7077677,-16776961,-16711681,-16711936,-65536;Thresholds:0.25,0.5,0.75,1</GradientConfig>
                       <Guid>0de79bc7-b69c-44fc-9aa6-ae9453469cfb</Guid>
                       <LineWidth>2</LineWidth>
                       <MarkColor>-16711936</MarkColor>
@@ -1101,6 +1120,9 @@
                       <MarkState>Auto</MarkState>
                       <Name>Series Style (3)</Name>
                       <SeriesType>Line</SeriesType>
+                      <ShowBars>false</ShowBars>
+                      <ShowMesh>true</ShowMesh>
+                      <ShowMeshGrid>false</ShowMeshGrid>
                       <SortPriority>100</SortPriority>
                       <Title>MeasurementMemberBase</Title>
                     </SeriesStyle>
@@ -1153,6 +1175,7 @@
           <Name>Overview Chart</Name>
           <OverviewVisible>false</OverviewVisible>
           <SortPriority>100</SortPriority>
+          <TimeColor>-12681525</TimeColor>
           <Title>MeasurementMemberBase</Title>
         </OverviewChart>
         <ChartStyle AssemblyName="TwinCAT.Measurement.Scope.API.Model">

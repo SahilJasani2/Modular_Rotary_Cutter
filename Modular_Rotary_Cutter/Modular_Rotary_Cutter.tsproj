@@ -38,6 +38,9 @@
 				<Module File="Object1 (MovingMaterialSim).xti"/>
 			</Modules>
 		</System>
+		<Motion>
+			<NC File="NC.xti"/>
+		</Motion>
 		<Plc>
 			<Project File="RotaryPLC.xti"/>
 		</Plc>

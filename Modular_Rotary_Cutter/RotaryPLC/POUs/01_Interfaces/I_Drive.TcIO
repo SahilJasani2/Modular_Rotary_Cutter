@@ -17,12 +17,12 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
     </Method>
-    <Method Name="M_MoveVel" Id="{96debd5f-4fc8-450d-b944-51a9099b3993}">
-      <Declaration><![CDATA[METHOD M_MoveVel : BOOL
+    <Method Name="M_MoveVelocity" Id="{96debd5f-4fc8-450d-b944-51a9099b3993}">
+      <Declaration><![CDATA[METHOD M_MoveVelocity : BOOL
 VAR_INPUT
-    fVelocity : LREAL; // Speed in mm/s or RPM
-END_VAR
-]]></Declaration>
+    fVelocity   : LREAL;         // Target speed in mm/s
+    nDirection  : MC_Direction;  // 1 = Positive, 2 = Negative, 3 = Current
+END_VAR]]></Declaration>
     </Method>
     <Method Name="M_Reset" Id="{c038a8fe-c703-45b7-a21c-6003194c8028}">
       <Declaration><![CDATA[METHOD M_Reset : BOOL

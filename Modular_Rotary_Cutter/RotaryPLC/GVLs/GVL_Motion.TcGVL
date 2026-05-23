@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_Motion" Id="{06453adf-34ae-4c87-8666-53ad91399afc}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+    // Real, persistent memory instances that the NC tree will bind to
+    stConveyorAxis : AXIS_REF;
+    stKnifeAxis    : AXIS_REF;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

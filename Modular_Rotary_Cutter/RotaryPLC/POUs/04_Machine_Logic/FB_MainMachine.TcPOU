@@ -62,6 +62,7 @@ END_IF
 // =========================================================
 // 1. HARDWARE LINKING
 // =========================================================
+fbProductSensor.bSimulationMode := TRUE;
 InfeedConveyor.iProductCam := fbProductSensor;
 InfeedConveyor.iMotor      := ConveyorMotor;
 RotaryKnife.iMotor         := KnifeMotor;
@@ -91,27 +92,36 @@ CASE eState OF
         IF NOT RotaryKnife.iMotor.P_Busy AND NOT RotaryKnife.iMotor.P_Error THEN 
             RotaryKnife.bHomeCommand := FALSE;
             eState := E_MachineState.EXECUTE;
+            
+            // --- NEW: Print to console when machine starts ---
+            ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_HINT, msgFmtStr := '>>> MACHINE STARTED: Reached EXECUTE State <<<', strArg := '');
         END_IF
 
     E_MachineState.EXECUTE:
         RotaryKnife.bEnable := TRUE;
-        InfeedConveyor.bEnable := TRUE; // Conveyor brakes released!
+        InfeedConveyor.bEnable := TRUE; 
 
-        // Ninja Chop Logic
+        // --- NEW: Run the Master Conveyor at a constant speed ---
+        // Parameter 1: Velocity (e.g., 500 mm/sec)
+        // Parameter 2: Direction (1 = Positive)
+        ConveyorMotor.M_MoveVelocity(500.0, 1);
+
+        // Ninja Chop Logic (We will replace this with Gearing soon, but keep it for now)
         IF fbProductSensor.P_RisingEdge THEN
             RotaryKnife.bSyncCommand := TRUE;
+            ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_HINT, msgFmtStr := '>>> C++ HANDSHAKE OK: Product Detected! <<<', strArg := '');
         END_IF
         
         IF fbProductSensor.P_FallingEdge THEN
             RotaryKnife.bSyncCommand := FALSE;
-			udiCutsCompleted := udiCutsCompleted + 1;
+            udiCutsCompleted := udiCutsCompleted + 1;
         END_IF
-
+        
         IF bCmdStop THEN
             bCmdStop := FALSE;
             eState := E_MachineState.HOLDING;
         END_IF
-
+		
     // ---------------------------------------------------------
     // PAUSING (Non-critical stops)
     // ---------------------------------------------------------
@@ -193,29 +203,32 @@ IF tonSensorJam.Q THEN
     eState := E_MachineState.ABORTING; 
 END_IF
 
-// --- Safety Detection ---
-IF NOT bSafetyOk AND NOT fbAlarmSafety.bRaised THEN
-    fbAlarmSafety.Raise(0);
-END_IF
-
 // =========================================================
-// 4. HARDWARE SAFETY MASK (Absolute Override)
+// 4. HARDWARE SAFETY MASK & DRIVE POWER
 // =========================================================
-// PHASE 2 FIX: Removed 'eState = ABORTING/ABORTED' from the override.
-// If it's a jam, we WANT the drives to remain enabled (holding position/braking).
-// We ONLY forcefully drop actuator power if the physical safety loop is broken.
-IF NOT bSafetyOk THEN
-    RotaryKnife.bEnable := FALSE;
+IF bSafetyOk THEN
+    // Provide power/enable to the servo drives
+    ConveyorMotor.bEnableCmd := TRUE;
+    KnifeMotor.bEnableCmd    := TRUE;
+ELSE
+    // Drop power and logical commands immediately if safety is breached
+    ConveyorMotor.bEnableCmd := FALSE;
+    KnifeMotor.bEnableCmd    := FALSE;
+    
+    RotaryKnife.bEnable      := FALSE;
     RotaryKnife.bSyncCommand := FALSE;
-    InfeedConveyor.bEnable := FALSE; 
+    InfeedConveyor.bEnable   := FALSE; 
 END_IF
 
 // =========================================================
 // 5. ALWAYS CALL THE MODULES AND MOTORS
 // =========================================================
 fbProductSensor();
-ConveyorMotor();
-KnifeMotor();
+
+// Pass the global references into the VAR_IN_OUT variables here:
+ConveyorMotor(Axis := GVL_Motion.stConveyorAxis);
+KnifeMotor(Axis := GVL_Motion.stKnifeAxis);
+
 InfeedConveyor();
 RotaryKnife();
 

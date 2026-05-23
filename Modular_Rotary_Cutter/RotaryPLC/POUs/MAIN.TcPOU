@@ -9,7 +9,18 @@ VAR
     RotaryCutter : FB_MainMachine;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// Execute the main state machine every PLC cycle
+      <ST><![CDATA[// =========================================================
+// 1. HARDWARE / SIMULATION MULTIPLEXER
+// =========================================================
+IF GVL_Safety.bSimulationMode THEN
+    GVL_Safety.bSafetyOk := GVL_Safety.bSimulateSafety;
+ELSE
+    GVL_Safety.bSafetyOk := GVL_Safety.bPhysicalSafetyOk;
+END_IF
+
+// =========================================================
+// 2. EXECUTE THE MACHINE
+// =========================================================
 RotaryCutter();]]></ST>
     </Implementation>
   </POU>

@@ -2,21 +2,23 @@
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_Drive" Id="{29575593-8274-429c-a355-871bac34c303}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_Drive IMPLEMENTS I_Drive
-VAR
-    // --- The Link to TwinCAT Motion (NC) ---
-    // This is the "Data Highway" between your PLC code and the NC-Task
+VAR_IN_OUT
     Axis : AXIS_REF; 
+END_VAR
 
+VAR_INPUT
+    // --- External Commands ---
+    bEnableCmd  : BOOL; 
+END_VAR
+
+VAR
     // --- Standard PLCopen Motion Blocks ---
     fbPower     : MC_Power;
     fbReset     : MC_Reset;
     fbStop      : MC_Stop;
     fbMoveAbs   : MC_MoveAbsolute;
     fbMoveVel   : MC_MoveVelocity;
-	fbHome      : MC_Home;
-
-    // --- Internal Status Tracking ---
-    bEnableCmd  : BOOL; // Linked to P_Enabled
+    fbHome      : MC_Home;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// 1. Always Update the Axis Status
@@ -95,19 +97,19 @@ fbMoveAbs.Execute := TRUE;
 M_MoveAbs := TRUE; // Return TRUE to show the command was received]]></ST>
       </Implementation>
     </Method>
-    <Method Name="M_MoveVel" Id="{37e662dd-1514-4118-a818-f288d90d7c84}">
-      <Declaration><![CDATA[METHOD M_MoveVel : BOOL
+    <Method Name="M_MoveVelocity" Id="{37e662dd-1514-4118-a818-f288d90d7c84}">
+      <Declaration><![CDATA[METHOD M_MoveVelocity : BOOL
 VAR_INPUT
-	(* Speed in mm/s or RPM*)
-	fVelocity	: LREAL;
-END_VAR
-]]></Declaration>
+    fVelocity   : LREAL;         // Target speed in mm/s
+    nDirection  : MC_Direction;  // 1 = Positive, 2 = Negative, 3 = Current
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[fbMoveVel.Velocity := fVelocity;
-fbMoveVel.Direction := MC_Positive_Direction;
-fbMoveVel.Execute := TRUE;
+        <ST><![CDATA[// Pass the inputs to the underlying PLCopen block
+fbMoveVel.Velocity  := fVelocity;
+fbMoveVel.Direction := nDirection;
+fbMoveVel.Execute   := TRUE;
 
-M_MoveVel := TRUE;]]></ST>
+M_MoveVelocity := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="M_Reset" Id="{b7138b05-71aa-42a5-bcb7-54cd0cd5d5d0}">

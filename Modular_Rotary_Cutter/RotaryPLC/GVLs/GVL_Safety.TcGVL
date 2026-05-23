@@ -3,8 +3,15 @@
   <GVL Name="GVL_Safety" Id="{597b61b6-4e0d-4df1-a136-de6922e9752c}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 VAR_GLOBAL
-    // This represents the signal from the Yellow TwinSAFE hardware
-    bSafetyOk AT %I* : BOOL; 
+    // 1. Physical Hardware Input (e.g., from TwinSAFE logic terminals)
+    bPhysicalSafetyOk AT %I* : BOOL;
+
+    // 2. Simulation Hooks (Defaulted to TRUE so the portfolio runs instantly)
+    bSimulationMode : BOOL := TRUE;
+    bSimulateSafety : BOOL := TRUE;
+
+    // 3. The final evaluated safety state used by the machine logic
+    bSafetyOk : BOOL;
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>
